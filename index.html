@@ -32,6 +32,7 @@ h1{text-align:center;color:#39ff14;font-size:20px;margin-bottom:4px;letter-spaci
 .fbtn:hover{background:#2ed810}
 .fbtn.ref{background:#e09f3e}.fbtn.ref:hover{background:#c88a2e}
 .fbtn.clr{background:#dc2f02}.fbtn.clr:hover{background:#b02602}
+.fbtn.dl{background:#4fc3f7}.fbtn.dl:hover{background:#3ab0e0}
 
 /* Charts */
 .chs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
@@ -56,6 +57,8 @@ tr:hover td{background:#1f2b47}
 .bg{background:#39ff1422;color:#39ff14}
 .br{background:#dc2f0222;color:#dc2f02}
 .zero{color:#dc2f02;font-weight:700}
+td a{color:#4fc3f7;text-decoration:none}
+td a:hover{text-decoration:underline;color:#39ff14}
 
 /* Pagination */
 .pag{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:10px}
@@ -82,7 +85,7 @@ tr:hover td{background:#1f2b47}
 <!-- Cards -->
 <div class="cards" id="cards"></div>
 
-<!-- Filters - dynamically generated for every column -->
+<!-- Filters -->
 <div class="fbox">
 <h3>Filters</h3>
 <div class="frow" id="filterRow">
@@ -90,6 +93,7 @@ tr:hover td{background:#1f2b47}
   <button class="fbtn" onclick="applyAll()">Apply</button>
   <button class="fbtn clr" onclick="clearFilters()">Clear</button>
   <button class="fbtn ref" onclick="loadData()">Refresh</button>
+  <button class="fbtn dl" onclick="downloadCSV()">Download CSV</button>
 </div>
 </div>
 
@@ -131,10 +135,11 @@ var API_URL = 'https://script.google.com/macros/s/AKfycby-O40MaoS8hea5zTGsb1eMtU
 // ========================================================
 
 var ALL_DATA=[], HEADERS=[], FILTERED=[], SORT_COL=-1, SORT_DIR=1, PAGE=0, PER_PAGE=100;
-var COL_FILTERS={}; // Dynamic filters: {colIndex: selectedValue}
-var STOCK_COL=12, ACTIVE_COL=13; // For badge styling (0-based)
+var STOCK_COL=12, ACTIVE_COL=13;
 var SORTABLE_FROM=15;
 var CHS={};
+// Columns that contain ratings (0-based) — will detect dynamically
+var RATING_COLS=[];
 
 function loadData(){
   document.getElementById('loader').style.display='block';
@@ -145,6 +150,7 @@ function loadData(){
       if(d.error){onErr(d.error);return;}
       ALL_DATA=d.rows||[];
       HEADERS=d.headers||[];
+      detectRatingCols();
       document.getElementById('loader').style.display='none';
       document.getElementById('app').style.display='block';
       buildColumnFilters();
@@ -157,14 +163,23 @@ function loadData(){
 
 function onErr(msg){document.getElementById('loader').innerHTML='<div style="color:#dc2f02">Error: '+msg+'</div>';}
 
+// Detect rating columns (headers containing "RATING" or "STAR")
+function detectRatingCols(){
+  RATING_COLS=[];
+  for(var i=0;i<HEADERS.length;i++){
+    var h=String(HEADERS[i]||'').toUpperCase();
+    if(h.indexOf('RATING')>=0||h.indexOf('STAR')>=0||h.indexOf('REVIEW')>=0){
+      RATING_COLS.push(i);
+    }
+  }
+}
+
 // ===== BUILD FILTERS FOR EVERY COLUMN =====
 function buildColumnFilters(){
-  // Collect unique values per column (only for text columns, skip blank headers)
   var colSets=[];
   for(var c=0;c<HEADERS.length;c++){
     var hdr=String(HEADERS[c]||'').trim();
     if(!hdr){colSets.push(null);continue;}
-    // Check if column is mostly numeric (skip filter for numeric columns)
     var isNumeric=true;
     var vals={};
     var uniqueCount=0;
@@ -174,10 +189,8 @@ function buildColumnFilters(){
       if(isNaN(Number(v))) isNumeric=false;
       if(!vals[v]){vals[v]=1;uniqueCount++;}
     }
-    // Only create dropdown if not purely numeric OR has few unique values (like stock/active)
     if(isNumeric && uniqueCount>20){colSets.push(null);continue;}
-    if(uniqueCount>200){colSets.push(null);continue;} // Too many unique values = skip dropdown
-    // Collect all unique values
+    if(uniqueCount>200){colSets.push(null);continue;}
     var allVals={};
     for(var r=0;r<ALL_DATA.length;r++){
       var v=String(ALL_DATA[r][c]||'').trim();
@@ -186,13 +199,10 @@ function buildColumnFilters(){
     colSets.push(Object.keys(allVals).sort());
   }
 
-  // Build filter dropdowns
   var frow=document.getElementById('filterRow');
-  // Remove old column filters (keep search + buttons)
   var oldFilters=frow.querySelectorAll('.col-filter');
   for(var i=0;i<oldFilters.length;i++) frow.removeChild(oldFilters[i]);
 
-  // Insert before search box
   var searchBox=document.getElementById('searchBox');
   for(var c=0;c<colSets.length;c++){
     if(!colSets[c]) continue;
@@ -200,8 +210,8 @@ function buildColumnFilters(){
     sel.className='col-filter';
     sel.setAttribute('data-col',c);
     sel.style.cssText='background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
-    var hdr=HEADERS[c]||('Col '+c);
-    sel.innerHTML='<option value="">All '+hdr+'</option>';
+    var hdr=String(HEADERS[c]||'').trim().toUpperCase();
+    sel.innerHTML='<option value="">'+hdr+'</option>';
     var items=colSets[c];
     for(var i=0;i<items.length;i++){
       sel.innerHTML+='<option value="'+items[i].replace(/"/g,'&quot;')+'">'+items[i]+'</option>';
@@ -221,14 +231,11 @@ function clearFilters(){
 
 // ===== APPLY ALL FILTERS + SORT =====
 function applyAll(){
-  // Gather active column filters
   var activeFilters=[];
   var sels=document.querySelectorAll('.col-filter');
   for(var i=0;i<sels.length;i++){
     var val=sels[i].value;
-    if(val){
-      activeFilters.push({col:parseInt(sels[i].getAttribute('data-col')),val:val.toUpperCase()});
-    }
+    if(val) activeFilters.push({col:parseInt(sels[i].getAttribute('data-col')),val:val.toUpperCase()});
   }
   var sq=document.getElementById('searchBox').value.trim().toUpperCase();
 
@@ -236,12 +243,10 @@ function applyAll(){
   for(var i=0;i<ALL_DATA.length;i++){
     var r=ALL_DATA[i];
     var pass=true;
-    // Check all column filters
     for(var f=0;f<activeFilters.length;f++){
       if(String(r[activeFilters[f].col]||'').trim().toUpperCase()!==activeFilters[f].val){pass=false;break;}
     }
     if(!pass) continue;
-    // Search
     if(sq){
       var found=false;
       for(var j=0;j<r.length;j++){if(String(r[j]||'').toUpperCase().indexOf(sq)>=0){found=true;break;}}
@@ -289,20 +294,22 @@ function renderCards(){
     if(ac==='INACTIVE')inact++;else act++;
   }
   var h='';
-  h+=cd('Total SKUs',fmt(d.length),'');
-  h+=cd('Today Sales',fmt(tdy),'g');
-  h+=cd('3-Day Sales',fmt(d3),'g');
-  h+=cd('7-Day Sales',fmt(d7),'o');
-  h+=cd('15-Day Sales',fmt(d15),'o');
-  h+=cd('30-Day Sales',fmt(d30),'p');
-  h+=cd('In Stock',fmt(ins),'g');
-  h+=cd('Out of Stock',fmt(oos),'r');
-  h+=cd('Active',fmt(act),'g');
-  h+=cd('Inactive',fmt(inact),'r');
+  // Row 1: Total SKUs + Sales data
+  h+=mkcd('Total SKUs',fmt(d.length),'');
+  h+=mkcd('Today Sales',fmt(tdy),'g');
+  h+=mkcd('3-Day Sales',fmt(d3),'g');
+  h+=mkcd('7-Day Sales',fmt(d7),'o');
+  h+=mkcd('15-Day Sales',fmt(d15),'o');
+  h+=mkcd('30-Day Sales',fmt(d30),'p');
+  // Row 2: Stock + Active (below sales)
+  h+=mkcd('In Stock',fmt(ins),'g');
+  h+=mkcd('Out of Stock',fmt(oos),'r');
+  h+=mkcd('Active',fmt(act),'g');
+  h+=mkcd('Inactive',fmt(inact),'r');
   document.getElementById('cards').innerHTML=h;
 }
 
-function cd(l,v,c){return'<div class="cd '+c+'"><div class="lb">'+l+'</div><div class="vl">'+v+'</div></div>'}
+function mkcd(l,v,c){return'<div class="cd '+c+'"><div class="lb">'+l+'</div><div class="vl">'+v+'</div></div>'}
 function fmt(n){return n==null?'0':Number(n).toLocaleString('en-IN')}
 
 function getSalesIndexes(){
@@ -327,7 +334,7 @@ function renderCharts(){
   for(var i=0;i<FILTERED.length;i++){
     var r=FILTERED[i];
     tdy+=Number(r[ci.today])||0;d3+=Number(r[ci.day3])||0;d7+=Number(r[ci.day7])||0;d15+=Number(r[ci.day15])||0;d30+=Number(r[ci.day30])||0;
-    var pl=String(r[1]||'').trim(); // Platform = col B = index 1
+    var pl=String(r[1]||'').trim();
     var st=String(r[STOCK_COL]||'').trim();
     var ac=String(r[ACTIVE_COL]||'').trim().toUpperCase();
     if(pl){if(!platMap[pl])platMap[pl]=0;platMap[pl]+=Number(r[ci.day30])||0;}
@@ -354,6 +361,40 @@ function bOpts(){return{responsive:true,plugins:{legend:{display:false}},scales:
 function pOpts(){return{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#eee',padding:10,font:{size:10}}}}}}
 function dc(id){if(CHS[id]){CHS[id].destroy();CHS[id]=null;}}
 
+// ===== CHECK IF VALUE IS A URL =====
+function isUrl(v){
+  var s=String(v||'').trim();
+  return s.indexOf('http://')===0||s.indexOf('https://')===0||s.indexOf('www.')===0;
+}
+
+function makeLink(v){
+  var s=String(v||'').trim();
+  var href=s;
+  if(s.indexOf('www.')===0) href='https://'+s;
+  // Shorten display text
+  var display=s.replace(/^https?:\/\//,'').replace(/^www\./,'');
+  if(display.length>30) display=display.substring(0,30)+'...';
+  return '<a href="'+href+'" target="_blank" rel="noopener">'+display+'</a>';
+}
+
+// ===== CHECK IF VALUE SHOULD BE RED =====
+function isRedValue(val, colIdx){
+  var v=val;
+  var num=parseFloat(v);
+
+  // 0 or empty in numeric columns (P onwards = index 15+)
+  if(colIdx>=SORTABLE_FROM){
+    if(v===0||v==='0'||v===''||v===null||v===undefined) return true;
+  }
+
+  // Ratings below 3.5
+  if(RATING_COLS.indexOf(colIdx)>=0){
+    if(!isNaN(num) && num<3.5 && num>=0) return true;
+  }
+
+  return false;
+}
+
 // ===== TABLE =====
 function renderTable(){
   PER_PAGE=parseInt(document.getElementById('ppSelect').value)||100;
@@ -361,7 +402,7 @@ function renderTable(){
   for(var i=0;i<HEADERS.length;i++){
     var isSortable=i>=SORTABLE_FROM;
     var arrow='';
-    if(SORT_COL===i) arrow='<span class="arrow">'+(SORT_DIR===1?'▲':'▼')+'</span>';
+    if(SORT_COL===i) arrow='<span class="arrow">'+(SORT_DIR===1?'\u25B2':'\u25BC')+'</span>';
     if(isSortable){
       th+='<th class="sortable" onclick="sortBy('+i+')">'+HEADERS[i]+arrow+'</th>';
     }else{
@@ -379,43 +420,15 @@ function renderTable(){
     tb+='<tr>';
     for(var j=0;j<r.length;j++){
       var val=r[j];
-      var cellStyle='';
+      var cellClass='';
+      var cellContent='';
 
       // Badge for Stock column
       if(j===STOCK_COL){
         var su=String(val||'').trim().toUpperCase();
-        val=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';
+        cellContent=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';
       }
       // Badge for Active column
       else if(j===ACTIVE_COL){
         var au=String(val||'').trim().toUpperCase();
-        val=au==='INACTIVE'?'<span class="badge br">INACTIVE</span>':'<span class="badge bg">'+val+'</span>';
-      }
-      // Red color for 0 values
-      else if(val===0||val==='0'||val===''){
-        var isNumCol=j>=SORTABLE_FROM; // Numeric columns from P onwards
-        if(isNumCol){
-          val=(val===''||val===null||val===undefined)?'0':'0';
-          cellStyle=' class="zero"';
-        }
-      }
-
-      tb+='<td'+cellStyle+'>'+val+'</td>';
-    }
-    tb+='</tr>';
-  }
-  document.getElementById('tbody').innerHTML=tb||'<tr><td colspan="'+HEADERS.length+'" style="text-align:center;color:#888;padding:20px">No data found</td></tr>';
-  document.getElementById('tcount').textContent='Showing '+(FILTERED.length>0?(start+1):0)+'-'+end+' of '+FILTERED.length;
-  document.getElementById('pageInfo').textContent='Page '+(PAGE+1)+' of '+totalPages;
-  document.getElementById('prevBtn').disabled=PAGE===0;
-  document.getElementById('nextBtn').disabled=end>=FILTERED.length;
-}
-
-function changePage(dir){PAGE+=dir;renderTable();}
-function changePageSize(){PAGE=0;renderTable();}
-
-// ===== INIT =====
-loadData();
-</script>
-</body>
-</html>
+        cellContent=au==='INACTIVE'?'<span class="badge br">INACTIVE</span>':'<
