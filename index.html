@@ -8,7 +8,12 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',sans-serif;background:#1a1a2e;color:#eee;padding:12px;min-height:100vh;overflow-x:hidden}
-h1{text-align:center;color:#39ff14;font-size:20px;margin-bottom:4px;letter-spacing:1px}
+.header-row{display:flex;justify-content:center;align-items:center;position:relative;margin-bottom:4px}
+h1{text-align:center;color:#39ff14;font-size:20px;letter-spacing:1px}
+.global-search-wrap{position:absolute;right:0;top:50%;transform:translateY(-50%)}
+.global-search{background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:8px;padding:8px 14px;font-size:13px;width:280px;transition:border-color .2s}
+.global-search:focus{border-color:#39ff14;outline:none;box-shadow:0 0 8px rgba(57,255,20,.3)}
+.global-search::placeholder{color:#555}
 .sub{text-align:center;color:#888;font-size:11px;margin-bottom:12px}
 .loading{text-align:center;padding:80px;color:#4fc3f7;font-size:18px}
 .spin{display:inline-block;width:30px;height:30px;border:3px solid #333;border-top:3px solid #4fc3f7;border-radius:50%;animation:sp .8s linear infinite;margin-bottom:10px}
@@ -60,7 +65,32 @@ td a:hover{text-decoration:underline;color:#39ff14}
 .srch{background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:6px 10px;font-size:12px;width:200px}
 .srch:focus{border-color:#4fc3f7;outline:none}
 .ft{text-align:center;color:#444;font-size:10px;margin-top:8px}
-@media(max-width:768px){.chs{grid-template-columns:1fr}.cards{grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}}
+@media(max-width:768px){.chs{grid-template-columns:1fr}.cards{grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}.global-search{width:160px;font-size:11px;padding:6px 10px}}
+
+/* CUSTOM NUMERIC DROPDOWN */
+.num-dd-wrap{position:relative;display:inline-block}
+.num-dd-btn{background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.num-dd-btn:hover{border-color:#4fc3f7}
+.num-dd-btn .dd-arrow{margin-left:4px;font-size:8px;color:#888}
+.num-dd-btn.active-filter{border-color:#39ff14;color:#39ff14}
+.num-dd-panel{display:none;position:absolute;top:100%;left:0;z-index:50;background:#0f1a2e;border:1px solid #4fc3f7;border-radius:8px;width:200px;padding:6px;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.num-dd-panel.show{display:block}
+.num-dd-search{width:100%;background:#1a1a2e;color:#eee;border:1px solid #333;border-radius:5px;padding:5px 8px;font-size:11px;margin-bottom:4px}
+.num-dd-search:focus{border-color:#4fc3f7;outline:none}
+.num-dd-search::placeholder{color:#555}
+.num-dd-sort{display:flex;flex-direction:column;gap:2px;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #333}
+.num-dd-sort-item{padding:5px 8px;font-size:11px;color:#eee;cursor:pointer;border-radius:4px;transition:.15s}
+.num-dd-sort-item:hover{background:#16213e;color:#4fc3f7}
+.num-dd-sort-item.selected{background:#39ff1422;color:#39ff14;font-weight:600}
+.num-dd-vals{max-height:180px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 #0f1a2e}
+.num-dd-vals::-webkit-scrollbar{width:5px}
+.num-dd-vals::-webkit-scrollbar-track{background:#0f1a2e}
+.num-dd-vals::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+.num-dd-val-item{padding:4px 8px;font-size:11px;color:#ccc;cursor:pointer;border-radius:4px;transition:.15s}
+.num-dd-val-item:hover{background:#16213e;color:#4fc3f7}
+.num-dd-val-item.selected{background:#4fc3f722;color:#4fc3f7;font-weight:600}
+.num-dd-clear{width:100%;background:#dc2f02;color:#fff;border:none;border-radius:4px;padding:4px;font-size:10px;font-weight:600;cursor:pointer;margin-top:4px}
+.num-dd-clear:hover{background:#ff4444}
 
 /* MODAL STYLES */
 .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:100;overflow-y:auto;padding:20px}
@@ -93,7 +123,12 @@ td a:hover{text-decoration:underline;color:#39ff14}
 </style>
 </head>
 <body>
-<h1>SKU WISE SALES DASHBOARD</h1>
+<div class="header-row">
+  <h1>SKU WISE SALES DASHBOARD</h1>
+  <div class="global-search-wrap">
+    <input class="global-search" id="globalSearch" placeholder="Search anything across all SKUs..." oninput="globalSearchHandler()">
+  </div>
+</div>
 <div class="sub" id="info">SKU WISE SALES</div>
 <div id="loader" class="loading"><div class="spin"></div><br>Loading dashboard data...<br><span style="font-size:13px;color:#888">This may take 15-20 seconds</span></div>
 <div id="app" style="display:none">
@@ -168,6 +203,17 @@ td a:hover{text-decoration:underline;color:#39ff14}
 </div>
 </div>
 
+<!-- GLOBAL SEARCH RESULTS PANEL -->
+<div id="globalResultsPanel" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:90;overflow-y:auto;padding:20px">
+<div style="background:#1a1a2e;border:1px solid #333;border-radius:12px;max-width:1400px;margin:0 auto;padding:20px;position:relative">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #333">
+    <div style="color:#39ff14;font-size:16px;font-weight:700" id="gResTitle">Search Results</div>
+    <button class="modal-close" onclick="closeGlobalSearch()">X CLOSE</button>
+  </div>
+  <div id="gResContent"></div>
+</div>
+</div>
+
 <script>
 var API_URL='https://script.google.com/macros/s/AKfycbwwILh7WaqCvWftUSvDwbcUHwyREoETo_7lxIlrSG3ZOE1QFtthlU-VvJLZLfH4inGZ0g/exec';
 var ALL_DATA=[],HEADERS=[],FILTERED=[],SORT_COL=-1,SORT_DIR=1,PAGE=0,PER_PAGE=100;
@@ -176,9 +222,16 @@ var SORTABLE_FROM=15;
 var CHS={};
 var RATING_COLS=[];
 var NUMERIC_COLS=[];
+var NUMERIC_UNIQUE_VALS={};
+
+// Numeric dropdown state
+var numDDState={};
 
 // Modal state
 var M={level:0,type:'',label:'',platform:'',filtered:[],skuList:[],skuFiltered:[],sortCol:-1,sortDir:1,page:0};
+
+// Global search state
+var G_TIMER=null,G_RESULTS=[],G_PAGE=0,G_SORT_COL=-1,G_SORT_DIR=1;
 
 // ===== LOAD DATA =====
 function loadData(){
@@ -202,7 +255,7 @@ function loadData(){
 function onDataLoaded(d){
   if(d.error){onErr(d.error);return;}
   ALL_DATA=d.rows||[];HEADERS=d.headers||[];
-  detectRatingCols();detectNumericCols();
+  detectRatingCols();detectNumericCols();collectNumericUniqueVals();
   document.getElementById('loader').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('lastUp').textContent='Updated: '+new Date().toLocaleString();
@@ -421,9 +474,101 @@ function downloadModalCSV(){
   link.click();URL.revokeObjectURL(link.href);
 }
 
+// ===== GLOBAL SEARCH (TOP RIGHT) =====
+function globalSearchHandler(){
+  clearTimeout(G_TIMER);
+  var val=document.getElementById('globalSearch').value.trim();
+  if(!val){closeGlobalSearch();return;}
+  G_TIMER=setTimeout(function(){runGlobalSearch(val);},400);
+}
+function runGlobalSearch(q){
+  var qu=q.toUpperCase();
+  G_RESULTS=[];
+  for(var i=0;i<ALL_DATA.length;i++){
+    var r=ALL_DATA[i];var found=false;
+    for(var j=0;j<r.length;j++){if(String(r[j]||'').toUpperCase().indexOf(qu)>=0){found=true;break;}}
+    if(found)G_RESULTS.push(r);
+  }
+  G_PAGE=0;G_SORT_COL=-1;G_SORT_DIR=1;
+  document.getElementById('gResTitle').textContent='Search Results for "'+q+'" ('+fmt(G_RESULTS.length)+' matches)';
+  renderGlobalResults();
+  document.getElementById('globalResultsPanel').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function renderGlobalResults(){
+  var pp=100;var start=G_PAGE*pp;var end=Math.min(start+pp,G_RESULTS.length);var tp=Math.ceil(G_RESULTS.length/pp)||1;
+  var data=G_RESULTS;
+  if(G_SORT_COL>=0){
+    data=G_RESULTS.slice();
+    data.sort(function(a,b){
+      var va=a[G_SORT_COL],vb=b[G_SORT_COL];
+      var na=parseFloat(va),nb=parseFloat(vb);
+      if(isNaN(na))na=-999999;if(isNaN(nb))nb=-999999;
+      if(!isNaN(parseFloat(va))&&!isNaN(parseFloat(vb)))return(na-nb)*G_SORT_DIR;
+      va=String(va||'').toUpperCase();vb=String(vb||'').toUpperCase();
+      return va<vb?-1*G_SORT_DIR:va>vb?1*G_SORT_DIR:0;
+    });
+    G_RESULTS=data;
+    end=Math.min(start+pp,data.length);
+  }
+  var h='<div style="display:flex;gap:6px;margin-bottom:10px;align-items:center"><button class="fbtn dl" onclick="downloadGlobalCSV()">Download CSV</button></div>';
+  h+='<div class="m-tbox"><h3>Full SKU Data <span>Showing '+(data.length>0?start+1:0)+'-'+end+' of '+data.length+'</span></h3>';
+  h+='<div class="m-twrap"><table><thead><tr>';
+  for(var i=0;i<HEADERS.length;i++){
+    var arrow='';if(G_SORT_COL===i)arrow='<span class="arrow">'+(G_SORT_DIR===1?'\u25B2':'\u25BC')+'</span>';
+    h+='<th class="sortable" onclick="gSort('+i+')">'+HEADERS[i]+arrow+'</th>';
+  }
+  h+='</tr></thead><tbody>';
+  for(var i=start;i<end;i++){
+    var r=data[i];h+='<tr>';
+    for(var j=0;j<r.length;j++){
+      var val=r[j];var cc='';var ct='';
+      if(j===STOCK_COL){var su=String(val||'').trim().toUpperCase();ct=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';}
+      else if(j===ACTIVE_COL){var au=String(val||'').trim().toUpperCase();ct=au==='INACTIVE'?'<span class="badge br">INACTIVE</span>':'<span class="badge bg">'+val+'</span>';}
+      else if(isUrl(val)){ct=makeLink(val);}
+      else if(j>=SORTABLE_FROM&&(val===0||val==='0'||val===''||val===null||val===undefined)){cc=' class="zero"';ct=(val===''||val===null||val===undefined)?'0':val;}
+      else{ct=(val===null||val===undefined)?'':val;}
+      h+='<td'+cc+'>'+ct+'</td>';
+    }
+    h+='</tr>';
+  }
+  if(data.length===0)h+='<tr><td colspan="'+HEADERS.length+'" style="text-align:center;color:#888;padding:20px">No results found</td></tr>';
+  h+='</tbody></table></div>';
+  h+='<div class="m-pag"><button onclick="gPage(-1)"'+(G_PAGE===0?' disabled':'')+'>&#60; Prev</button>';
+  h+='<span>Page '+(G_PAGE+1)+' of '+tp+'</span>';
+  h+='<button onclick="gPage(1)"'+(end>=data.length?' disabled':'')+'>Next &#62;</button></div></div>';
+  document.getElementById('gResContent').innerHTML=h;
+}
+function gSort(col){if(G_SORT_COL===col){G_SORT_DIR*=-1;}else{G_SORT_COL=col;G_SORT_DIR=1;}G_PAGE=0;renderGlobalResults();}
+function gPage(dir){G_PAGE+=dir;renderGlobalResults();}
+function closeGlobalSearch(){
+  document.getElementById('globalResultsPanel').style.display='none';
+  document.body.style.overflow='';
+}
+function downloadGlobalCSV(){
+  if(!G_RESULTS.length){alert('No data!');return;}
+  var csv=[];var hr=[];
+  for(var i=0;i<HEADERS.length;i++)hr.push('"'+String(HEADERS[i]||'').replace(/"/g,'""')+'"');csv.push(hr.join(','));
+  for(var r=0;r<G_RESULTS.length;r++){var row=[];for(var c=0;c<G_RESULTS[r].length;c++){row.push('"'+String(G_RESULTS[r][c]===null||G_RESULTS[r][c]===undefined?'':G_RESULTS[r][c]).replace(/"/g,'""')+'"');}csv.push(row.join(','));}
+  var blob=new Blob([csv.join('\n')],{type:'text/csv;charset=utf-8;'});var link=document.createElement('a');link.href=URL.createObjectURL(blob);
+  link.download='SKU_GlobalSearch_'+new Date().toISOString().slice(0,10)+'.csv';link.click();URL.revokeObjectURL(link.href);
+}
+
 // ===== MAIN TABLE (OLD DASHBOARD) =====
 function detectRatingCols(){RATING_COLS=[];for(var i=0;i<HEADERS.length;i++){var h=String(HEADERS[i]||'').toUpperCase();if(h.indexOf('RATING')>=0||h.indexOf('STAR')>=0||h.indexOf('REVIEW')>=0)RATING_COLS.push(i);}}
 function detectNumericCols(){NUMERIC_COLS=[];for(var c=0;c<HEADERS.length;c++){var nc=0,t=0;for(var r=0;r<ALL_DATA.length&&r<500;r++){var v=ALL_DATA[r][c];if(v===''||v===null||v===undefined)continue;t++;if(!isNaN(Number(v)))nc++;}if(t>0&&nc/t>0.7)NUMERIC_COLS.push(c);}}
+function collectNumericUniqueVals(){
+  NUMERIC_UNIQUE_VALS={};
+  for(var ci=0;ci<NUMERIC_COLS.length;ci++){
+    var c=NUMERIC_COLS[ci];var map={};
+    for(var r=0;r<ALL_DATA.length;r++){
+      var v=ALL_DATA[r][c];if(v===''||v===null||v===undefined)continue;
+      var num=Number(v);if(!isNaN(num))map[num]=1;
+    }
+    var arr=Object.keys(map).map(Number);arr.sort(function(a,b){return a-b;});
+    NUMERIC_UNIQUE_VALS[c]=arr;
+  }
+}
 function buildColumnFilters(){
   var colSets=[];
   for(var c=0;c<HEADERS.length;c++){
@@ -435,25 +580,149 @@ function buildColumnFilters(){
     colSets.push(Object.keys(vals).sort());
   }
   var frow=document.getElementById('filterRow');
-  var old=frow.querySelectorAll('.col-filter');for(var i=0;i<old.length;i++)frow.removeChild(old[i]);
+  var old=frow.querySelectorAll('.col-filter,.num-dd-wrap');for(var i=0;i<old.length;i++)frow.removeChild(old[i]);
   var sb=document.getElementById('searchBox');
+  numDDState={};
   for(var c=0;c<colSets.length;c++){
     if(!colSets[c])continue;
-    var sel=document.createElement('select');sel.className='col-filter';sel.setAttribute('data-col',c);
-    sel.style.cssText='background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
     var hdr=String(HEADERS[c]||'').trim().toUpperCase();
-    if(colSets[c]==='NUMERIC'){sel.setAttribute('data-type','numeric');sel.innerHTML='<option value="">'+hdr+'</option><option value="low-high">Low to High</option><option value="high-low">High to Low</option>';}
-    else{sel.setAttribute('data-type','text');sel.innerHTML='<option value="">'+hdr+'</option>';var items=colSets[c];for(var i=0;i<items.length;i++){sel.innerHTML+='<option value="'+items[i].replace(/"/g,'&quot;')+'">'+items[i]+'</option>';}}
-    sel.onchange=applyAll;frow.insertBefore(sel,sb);
+    if(colSets[c]==='NUMERIC'){
+      // Custom dropdown for numeric columns
+      var wrap=document.createElement('div');
+      wrap.className='num-dd-wrap';
+      wrap.setAttribute('data-col',c);
+      numDDState[c]={sort:'',exactVal:null};
+      wrap.innerHTML='<div class="num-dd-btn" onclick="toggleNumDD('+c+')" id="numBtn_'+c+'"><span>'+hdr+'</span><span class="dd-arrow">&#9660;</span></div>'
+        +'<div class="num-dd-panel" id="numPanel_'+c+'">'
+        +'<input class="num-dd-search" placeholder="Search number..." oninput="filterNumDDList('+c+',this.value)" id="numSearch_'+c+'">'
+        +'<div class="num-dd-sort">'
+        +'<div class="num-dd-sort-item" id="numLH_'+c+'" onclick="setNumSort('+c+',\'low-high\')">Low to High</div>'
+        +'<div class="num-dd-sort-item" id="numHL_'+c+'" onclick="setNumSort('+c+',\'high-low\')">High to Low</div>'
+        +'</div>'
+        +'<div class="num-dd-vals" id="numVals_'+c+'"></div>'
+        +'<button class="num-dd-clear" onclick="clearNumDD('+c+')">Clear Filter</button>'
+        +'</div>';
+      frow.insertBefore(wrap,sb);
+      renderNumDDList(c,'');
+    } else {
+      var sel=document.createElement('select');sel.className='col-filter';sel.setAttribute('data-col',c);
+      sel.style.cssText='background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
+      sel.setAttribute('data-type','text');sel.innerHTML='<option value="">'+hdr+'</option>';
+      var items=colSets[c];for(var i=0;i<items.length;i++){sel.innerHTML+='<option value="'+items[i].replace(/"/g,'&quot;')+'">'+items[i]+'</option>';}
+      sel.onchange=applyAll;frow.insertBefore(sel,sb);
+    }
   }
 }
-function clearFilters(){var sels=document.querySelectorAll('.col-filter');for(var i=0;i<sels.length;i++)sels[i].value='';document.getElementById('searchBox').value='';SORT_COL=-1;SORT_DIR=1;applyAll();}
+
+// ===== NUMERIC DROPDOWN LOGIC =====
+function toggleNumDD(col){
+  var panel=document.getElementById('numPanel_'+col);
+  var isOpen=panel.classList.contains('show');
+  closeAllNumDDs();
+  if(!isOpen){panel.classList.add('show');document.getElementById('numSearch_'+col).focus();}
+}
+function closeAllNumDDs(){
+  var panels=document.querySelectorAll('.num-dd-panel');
+  for(var i=0;i<panels.length;i++)panels[i].classList.remove('show');
+}
+function renderNumDDList(col,search){
+  var vals=NUMERIC_UNIQUE_VALS[col]||[];
+  var container=document.getElementById('numVals_'+col);
+  var searchNum=search.trim();
+  var h='';
+  var shown=0;
+  for(var i=0;i<vals.length;i++){
+    var v=vals[i];
+    var vs=String(v);
+    if(searchNum&&vs.indexOf(searchNum)<0)continue;
+    var selected=(numDDState[col]&&numDDState[col].exactVal!==null&&numDDState[col].exactVal===v);
+    h+='<div class="num-dd-val-item'+(selected?' selected':'')+'" onclick="setNumExact('+col+','+v+')">'+vs+'</div>';
+    shown++;
+    if(shown>=200)break;
+  }
+  if(shown===0)h='<div style="padding:6px 8px;color:#555;font-size:11px">No values found</div>';
+  container.innerHTML=h;
+}
+function filterNumDDList(col,search){renderNumDDList(col,search);}
+function setNumSort(col,dir){
+  numDDState[col].sort=dir;numDDState[col].exactVal=null;
+  updateNumBtnLabel(col);
+  closeAllNumDDs();
+  applyAll();
+}
+function setNumExact(col,val){
+  numDDState[col].exactVal=val;numDDState[col].sort='';
+  updateNumBtnLabel(col);
+  closeAllNumDDs();
+  applyAll();
+}
+function clearNumDD(col){
+  numDDState[col]={sort:'',exactVal:null};
+  document.getElementById('numSearch_'+col).value='';
+  renderNumDDList(col,'');
+  updateNumBtnLabel(col);
+  closeAllNumDDs();
+  applyAll();
+}
+function updateNumBtnLabel(col){
+  var hdr=String(HEADERS[col]||'').trim().toUpperCase();
+  var btn=document.getElementById('numBtn_'+col);
+  var state=numDDState[col];
+  if(state.exactVal!==null){btn.querySelector('span').textContent=hdr+': '+state.exactVal;btn.classList.add('active-filter');}
+  else if(state.sort){btn.querySelector('span').textContent=hdr+' ('+(state.sort==='low-high'?'L-H':'H-L')+')';btn.classList.add('active-filter');}
+  else{btn.querySelector('span').textContent=hdr;btn.classList.remove('active-filter');}
+  // Update sort item highlights
+  var lh=document.getElementById('numLH_'+col);
+  var hl=document.getElementById('numHL_'+col);
+  if(lh)lh.className='num-dd-sort-item'+(state.sort==='low-high'?' selected':'');
+  if(hl)hl.className='num-dd-sort-item'+(state.sort==='high-low'?' selected':'');
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.num-dd-wrap')){closeAllNumDDs();}
+});
+
+function clearFilters(){
+  var sels=document.querySelectorAll('.col-filter');for(var i=0;i<sels.length;i++)sels[i].value='';
+  document.getElementById('searchBox').value='';
+  document.getElementById('globalSearch').value='';
+  for(var k in numDDState){
+    numDDState[k]={sort:'',exactVal:null};
+    var s=document.getElementById('numSearch_'+k);if(s)s.value='';
+    renderNumDDList(parseInt(k),'');
+    updateNumBtnLabel(parseInt(k));
+  }
+  SORT_COL=-1;SORT_DIR=1;applyAll();
+}
 function applyAll(){
-  var tf=[],ns=null;var sels=document.querySelectorAll('.col-filter');
-  for(var i=0;i<sels.length;i++){var v=sels[i].value;if(!v)continue;var col=parseInt(sels[i].getAttribute('data-col'));var type=sels[i].getAttribute('data-type');if(type==='numeric'){ns={col:col,dir:v==='low-high'?1:-1};}else{tf.push({col:col,val:v.toUpperCase()});}}
+  var tf=[];var ns=null;var exactFilters=[];
+  // Text filters
+  var sels=document.querySelectorAll('.col-filter');
+  for(var i=0;i<sels.length;i++){var v=sels[i].value;if(!v)continue;var col=parseInt(sels[i].getAttribute('data-col'));tf.push({col:col,val:v.toUpperCase()});}
+  // Numeric dropdown filters
+  for(var k in numDDState){
+    var col=parseInt(k);var state=numDDState[k];
+    if(state.sort){ns={col:col,dir:state.sort==='low-high'?1:-1};}
+    if(state.exactVal!==null){exactFilters.push({col:col,val:state.exactVal});}
+  }
   var sq=document.getElementById('searchBox').value.trim().toUpperCase();
   FILTERED=[];
-  for(var i=0;i<ALL_DATA.length;i++){var r=ALL_DATA[i];var pass=true;for(var f=0;f<tf.length;f++){if(String(r[tf[f].col]||'').trim().toUpperCase()!==tf[f].val){pass=false;break;}}if(!pass)continue;if(sq){var found=false;for(var j=0;j<r.length;j++){if(String(r[j]||'').toUpperCase().indexOf(sq)>=0){found=true;break;}}if(!found)continue;}FILTERED.push(r);}
+  for(var i=0;i<ALL_DATA.length;i++){
+    var r=ALL_DATA[i];var pass=true;
+    // Text filters
+    for(var f=0;f<tf.length;f++){if(String(r[tf[f].col]||'').trim().toUpperCase()!==tf[f].val){pass=false;break;}}
+    if(!pass)continue;
+    // Exact numeric filters
+    for(var f=0;f<exactFilters.length;f++){
+      var rv=Number(r[exactFilters[f].col]);
+      if(isNaN(rv)||rv!==exactFilters[f].val){pass=false;break;}
+    }
+    if(!pass)continue;
+    // Search
+    if(sq){var found=false;for(var j=0;j<r.length;j++){if(String(r[j]||'').toUpperCase().indexOf(sq)>=0){found=true;break;}}if(!found)continue;}
+    FILTERED.push(r);
+  }
   if(ns){SORT_COL=ns.col;SORT_DIR=ns.dir;}
   if(SORT_COL>=0){FILTERED.sort(function(a,b){var va=a[SORT_COL],vb=b[SORT_COL];var na=parseFloat(va),nb=parseFloat(vb);if(isNaN(na))na=-999999;if(isNaN(nb))nb=-999999;if(!isNaN(parseFloat(va))&&!isNaN(parseFloat(vb)))return(na-nb)*SORT_DIR;va=String(va||'').toUpperCase();vb=String(vb||'').toUpperCase();return va<vb?-1*SORT_DIR:va>vb?1*SORT_DIR:0;});}
   PAGE=0;renderCharts();renderTable();
