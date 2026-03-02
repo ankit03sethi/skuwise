@@ -14,7 +14,7 @@ h1{text-align:center;color:#39ff14;font-size:20px;letter-spacing:1px}
 .global-search{background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:8px;padding:8px 14px;font-size:13px;width:280px;transition:border-color .2s}
 .global-search:focus{border-color:#39ff14;outline:none;box-shadow:0 0 8px rgba(57,255,20,.3)}
 .global-search::placeholder{color:#555}
-.sub{text-align:center;color:#888;font-size:11px;margin-bottom:12px}
+.sub{text-align:center;color:#fff;font-size:20px;margin-bottom:12px;letter-spacing:1px;font-weight:700}
 .loading{text-align:center;padding:80px;color:#4fc3f7;font-size:18px}
 .spin{display:inline-block;width:30px;height:30px;border:3px solid #333;border-top:3px solid #4fc3f7;border-radius:50%;animation:sp .8s linear infinite;margin-bottom:10px}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -153,9 +153,13 @@ td a:hover{text-decoration:underline;color:#39ff14}
   <button class="fbtn" onclick="applyAll()">Apply</button>
   <button class="fbtn clr" onclick="clearFilters()">Clear</button>
   <button class="fbtn ref" onclick="loadData()">Refresh</button>
+  <button class="fbtn clr" onclick="clearFilters()">Clear All Filters</button>
   <button class="fbtn dl" onclick="downloadMainCSV()">Download CSV</button>
 </div>
 </div>
+
+<!-- 30-DAY TREND CHART (FULL WIDTH) -->
+<div class="chb" style="margin-bottom:12px"><h3>30-Day Sales Trend (Estimated Daily Avg)</h3><canvas id="ch5"></canvas></div>
 
 <!-- CHARTS -->
 <div class="chs">
@@ -619,7 +623,7 @@ function buildColumnFilters(){
   var aiSel=document.createElement('select');aiSel.className='col-filter';aiSel.id='activeInactiveFilter';
   aiSel.style.cssText='background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
   aiSel.setAttribute('data-type','special-ai');
-  aiSel.innerHTML='<option value="">ACTIVE/INACTIVE</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option>';
+  aiSel.innerHTML='<option value="">Active - Inactive</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option>';
   aiSel.onchange=applyAll;
   if(companyFilterEl&&companyFilterEl.nextSibling){frow.insertBefore(aiSel,companyFilterEl.nextSibling);}
   else{frow.insertBefore(aiSel,sb);}
@@ -774,6 +778,35 @@ function renderCharts(){
   for(var i=0;i<platArr.length;i++){pl2.push(platArr[i].n);pv.push(platArr[i].v);}
   dc('ch3');CHS.ch3=new Chart(document.getElementById('ch3'),{type:'bar',data:{labels:pl2,datasets:[{data:pv,backgroundColor:pc.slice(0,pl2.length),borderRadius:5}]},options:bOpts()});
   dc('ch4');CHS.ch4=new Chart(document.getElementById('ch4'),{type:'doughnut',data:{labels:['Active','Inactive'],datasets:[{data:[actCount,inactCount],backgroundColor:['#39ff14','#dc2f02'],borderWidth:0}]},options:pOpts()});
+
+  // 30-Day Sales Trend - estimate daily from period totals
+  // Day 1=today, Days 2-3 avg from 3day, Days 4-7 from 7day, Days 8-15 from 15day, Days 16-30 from 30day
+  var dayAvg1=tdy;
+  var dayAvg2_3=(d3-tdy)>0?(d3-tdy)/2:0;
+  var dayAvg4_7=(d7-d3)>0?(d7-d3)/4:0;
+  var dayAvg8_15=(d15-d7)>0?(d15-d7)/8:0;
+  var dayAvg16_30=(d30-d15)>0?(d30-d15)/15:0;
+  // Build 30 bars from Day 30 (oldest, left) to Day 1 (newest, right)
+  var dailyVals=[];
+  for(var d=30;d>=1;d--){
+    var v=0;
+    if(d===1)v=dayAvg1;
+    else if(d<=3)v=dayAvg2_3;
+    else if(d<=7)v=dayAvg4_7;
+    else if(d<=15)v=dayAvg8_15;
+    else v=dayAvg16_30;
+    dailyVals.push(Math.round(v));
+  }
+  // Colors: green if >= prev day, red if < prev day. First bar always green
+  var trendColors=[];
+  for(var i=0;i<dailyVals.length;i++){
+    if(i===0){trendColors.push('#39ff14');}
+    else{trendColors.push(dailyVals[i]>=dailyVals[i-1]?'#39ff14':'#dc2f02');}
+  }
+  var trendLabels=[];
+  for(var d=30;d>=1;d--){trendLabels.push('Day -'+d);}
+  trendLabels[trendLabels.length-1]='Today';
+  dc('ch5');CHS.ch5=new Chart(document.getElementById('ch5'),{type:'bar',data:{labels:trendLabels,datasets:[{data:dailyVals,backgroundColor:trendColors,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return'Est. Daily Sales: '+Number(ctx.raw).toLocaleString('en-IN');}}}},scales:{x:{ticks:{color:'#888',font:{size:9},maxRotation:45},grid:{color:'#222'}},y:{ticks:{color:'#888',font:{size:10}},grid:{color:'#222'}}}}});
 }
 function bOpts(){return{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{color:'#222'}},y:{ticks:{color:'#888',font:{size:10}},grid:{color:'#222'}}}};}
 function pOpts(){return{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#eee',padding:10,font:{size:10}}}}};}
