@@ -583,6 +583,8 @@ function buildColumnFilters(){
   var old=frow.querySelectorAll('.col-filter,.num-dd-wrap');for(var i=0;i<old.length;i++)frow.removeChild(old[i]);
   var sb=document.getElementById('searchBox');
   numDDState={};
+  // Track where Company filter ends up so we can insert Active/Inactive after it
+  var companyFilterEl=null;
   for(var c=0;c<colSets.length;c++){
     if(!colSets[c])continue;
     var hdr=String(HEADERS[c]||'').trim().toUpperCase();
@@ -610,8 +612,17 @@ function buildColumnFilters(){
       sel.setAttribute('data-type','text');sel.innerHTML='<option value="">'+hdr+'</option>';
       var items=colSets[c];for(var i=0;i<items.length;i++){sel.innerHTML+='<option value="'+items[i].replace(/"/g,'&quot;')+'">'+items[i]+'</option>';}
       sel.onchange=applyAll;frow.insertBefore(sel,sb);
+      if(c===COMPANY_COL)companyFilterEl=sel;
     }
   }
+  // Add Active/Inactive filter after Company filter
+  var aiSel=document.createElement('select');aiSel.className='col-filter';aiSel.id='activeInactiveFilter';
+  aiSel.style.cssText='background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
+  aiSel.setAttribute('data-type','special-ai');
+  aiSel.innerHTML='<option value="">ACTIVE/INACTIVE</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option>';
+  aiSel.onchange=applyAll;
+  if(companyFilterEl&&companyFilterEl.nextSibling){frow.insertBefore(aiSel,companyFilterEl.nextSibling);}
+  else{frow.insertBefore(aiSel,sb);}
 }
 
 // ===== NUMERIC DROPDOWN LOGIC =====
@@ -685,6 +696,7 @@ document.addEventListener('click',function(e){
 
 function clearFilters(){
   var sels=document.querySelectorAll('.col-filter');for(var i=0;i<sels.length;i++)sels[i].value='';
+  var aiF=document.getElementById('activeInactiveFilter');if(aiF)aiF.value='';
   document.getElementById('searchBox').value='';
   document.getElementById('globalSearch').value='';
   for(var k in numDDState){
@@ -697,9 +709,16 @@ function clearFilters(){
 }
 function applyAll(){
   var tf=[];var ns=null;var exactFilters=[];
+  var aiFilter='';
   // Text filters
   var sels=document.querySelectorAll('.col-filter');
-  for(var i=0;i<sels.length;i++){var v=sels[i].value;if(!v)continue;var col=parseInt(sels[i].getAttribute('data-col'));tf.push({col:col,val:v.toUpperCase()});}
+  for(var i=0;i<sels.length;i++){
+    var v=sels[i].value;if(!v)continue;
+    var dtype=sels[i].getAttribute('data-type');
+    if(dtype==='special-ai'){aiFilter=v;continue;}
+    var col=parseInt(sels[i].getAttribute('data-col'));
+    tf.push({col:col,val:v.toUpperCase()});
+  }
   // Numeric dropdown filters
   for(var k in numDDState){
     var col=parseInt(k);var state=numDDState[k];
@@ -712,6 +731,19 @@ function applyAll(){
     var r=ALL_DATA[i];var pass=true;
     // Text filters
     for(var f=0;f<tf.length;f++){if(String(r[tf[f].col]||'').trim().toUpperCase()!==tf[f].val){pass=false;break;}}
+    if(!pass)continue;
+    // Active/Inactive special filter on column N (ACTIVE_COL)
+    if(aiFilter){
+      var av=String(r[ACTIVE_COL]||'').trim().toUpperCase();
+      var anum=parseFloat(r[ACTIVE_COL]);
+      if(aiFilter==='ACTIVE'){
+        // Active = any numeric value 0 or above (not blank, not INACTIVE)
+        if(av===''||av==='INACTIVE'||isNaN(anum)){pass=false;}
+      } else if(aiFilter==='INACTIVE'){
+        // Inactive = blank or "INACTIVE" text
+        if(av!==''&&av!=='INACTIVE'){pass=false;}
+      }
+    }
     if(!pass)continue;
     // Exact numeric filters
     for(var f=0;f<exactFilters.length;f++){
