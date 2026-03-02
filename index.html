@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',sans-serif;background:#1a1a2e;color:#eee;padding:12px;min-height:100vh}
+body{font-family:'Segoe UI',sans-serif;background:#1a1a2e;color:#eee;padding:12px;min-height:100vh;overflow-x:hidden}
 h1{text-align:center;color:#39ff14;font-size:20px;margin-bottom:4px;letter-spacing:1px}
 .sub{text-align:center;color:#666;font-size:11px;margin-bottom:12px}
 .loading{text-align:center;padding:80px;color:#4fc3f7;font-size:18px}
@@ -40,8 +40,9 @@ h1{text-align:center;color:#39ff14;font-size:20px;margin-bottom:4px;letter-spaci
 .tbox{background:#16213e;border-radius:10px;padding:12px;margin-bottom:12px}
 .tbox h3{color:#4fc3f7;font-size:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center}
 .tbox h3 span{color:#888;font-size:11px;font-weight:400}
-.twrap{overflow-x:auto;max-height:500px;overflow-y:auto}
-table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}
+.tbox{position:relative}
+.twrap{overflow-x:auto;overflow-y:auto;max-height:500px;-webkit-overflow-scrolling:touch;width:100%}
+table{border-collapse:collapse;font-size:11px;white-space:nowrap;min-width:100%}
 th{background:#0f3460;color:#4fc3f7;padding:6px 8px;text-align:left;position:sticky;top:0;z-index:2;cursor:default;user-select:none}
 th.sortable{cursor:pointer}
 th.sortable:hover{background:#1a4a80;color:#39ff14}
@@ -76,7 +77,8 @@ td a:hover{text-decoration:underline;color:#39ff14}
 <div id="loader" class="loading"><div class="spin"></div><br>Loading dashboard data...<br><span style="font-size:13px;color:#888">This may take 15-20 seconds</span></div>
 <div id="app" style="display:none">
 
-<div class="cards" id="cards"></div>
+<div class="cards" id="salesCards"></div>
+<div class="cards" id="stockCards"></div>
 
 <div class="fbox">
 <h3>Filters</h3>
@@ -184,7 +186,7 @@ function onDataLoaded(d){
   buildColumnFilters();
   applyAll();
   document.getElementById('lastUp').textContent='Updated: '+new Date().toLocaleString();
-  document.getElementById('info').textContent=ALL_DATA.length+' SKUs | '+HEADERS.length+' columns';
+  document.getElementById('info').textContent='SKU WISE SALES';
 }
 
 function onErr(msg){document.getElementById('loader').innerHTML='<div style="color:#dc2f02;font-size:14px">'+msg+'</div>';}
@@ -346,18 +348,21 @@ function renderCards(){
     if(st==='IN STOCK')ins++;else oos++;
     if(ac==='INACTIVE')inact++;else act++;
   }
-  var h='';
-  h+=mkcd('Total SKUs',fmt(d.length),'');
-  h+=mkcd('Today Sales',fmt(tdy),'g');
-  h+=mkcd('3-Day Sales',fmt(d3),'g');
-  h+=mkcd('7-Day Sales',fmt(d7),'o');
-  h+=mkcd('15-Day Sales',fmt(d15),'o');
-  h+=mkcd('30-Day Sales',fmt(d30),'p');
-  h+=mkcd('In Stock',fmt(ins),'g');
-  h+=mkcd('Out of Stock',fmt(oos),'r');
-  h+=mkcd('Active',fmt(act),'g');
-  h+=mkcd('Inactive',fmt(inact),'r');
-  document.getElementById('cards').innerHTML=h;
+  var salesH='';
+  salesH+=mkcd('Total SKUs',fmt(d.length),'');
+  salesH+=mkcd('Today Sales',fmt(tdy),'g');
+  salesH+=mkcd('3-Day Sales',fmt(d3),'g');
+  salesH+=mkcd('7-Day Sales',fmt(d7),'o');
+  salesH+=mkcd('15-Day Sales',fmt(d15),'o');
+  salesH+=mkcd('30-Day Sales',fmt(d30),'p');
+  document.getElementById('salesCards').innerHTML=salesH;
+
+  var stockH='';
+  stockH+=mkcd('In Stock',fmt(ins),'g');
+  stockH+=mkcd('Out of Stock',fmt(oos),'r');
+  stockH+=mkcd('Active',fmt(act),'g');
+  stockH+=mkcd('Inactive',fmt(inact),'r');
+  document.getElementById('stockCards').innerHTML=stockH;
 }
 
 function mkcd(l,v,c){return'<div class="cd '+c+'"><div class="lb">'+l+'</div><div class="vl">'+v+'</div></div>'}
@@ -504,15 +509,4 @@ function downloadCSV(){
     csv.push(row.join(','));
   }
   var blob=new Blob([csv.join('\n')],{type:'text/csv;charset=utf-8;'});
-  var link=document.createElement('a');
-  link.href=URL.createObjectURL(blob);
-  link.download='SKU_WISE_SALES_'+new Date().toISOString().slice(0,10)+'.csv';
-  link.click();
-  URL.revokeObjectURL(link.href);
-}
-
-// ===== INIT =====
-loadData();
-</script>
-</body>
-</html>
+  var link=document.creat
