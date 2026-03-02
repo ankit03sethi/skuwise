@@ -14,7 +14,6 @@ h1{text-align:center;color:#39ff14;font-size:20px;margin-bottom:4px;letter-spaci
 .spin{display:inline-block;width:30px;height:30px;border:3px solid #333;border-top:3px solid #4fc3f7;border-radius:50%;animation:sp .8s linear infinite;margin-bottom:10px}
 @keyframes sp{to{transform:rotate(360deg)}}
 
-/* Cards */
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px}
 .cd{background:#16213e;border-radius:10px;padding:10px;text-align:center;border-left:4px solid #4fc3f7;transition:.2s}
 .cd:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(0,0,0,.3)}
@@ -22,7 +21,6 @@ h1{text-align:center;color:#39ff14;font-size:20px;margin-bottom:4px;letter-spaci
 .cd .lb{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px}
 .cd .vl{font-size:20px;font-weight:700;color:#fff}
 
-/* Filters */
 .fbox{background:#16213e;border-radius:10px;padding:12px;margin-bottom:12px}
 .fbox h3{color:#4fc3f7;font-size:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
 .frow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
@@ -34,13 +32,11 @@ h1{text-align:center;color:#39ff14;font-size:20px;margin-bottom:4px;letter-spaci
 .fbtn.clr{background:#dc2f02}.fbtn.clr:hover{background:#b02602}
 .fbtn.dl{background:#4fc3f7}.fbtn.dl:hover{background:#3ab0e0}
 
-/* Charts */
 .chs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .chb{background:#16213e;border-radius:10px;padding:12px}
 .chb h3{color:#4fc3f7;font-size:11px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
 .chb canvas{max-height:240px}
 
-/* Table */
 .tbox{background:#16213e;border-radius:10px;padding:12px;margin-bottom:12px}
 .tbox h3{color:#4fc3f7;font-size:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center}
 .tbox h3 span{color:#888;font-size:11px;font-weight:400}
@@ -60,14 +56,12 @@ tr:hover td{background:#1f2b47}
 td a{color:#4fc3f7;text-decoration:none}
 td a:hover{text-decoration:underline;color:#39ff14}
 
-/* Pagination */
 .pag{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:10px}
 .pag button{background:#0f3460;color:#4fc3f7;border:1px solid #333;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer}
 .pag button:hover{background:#1a4a80}
 .pag button:disabled{opacity:.3;cursor:default}
 .pag span{color:#888;font-size:12px}
 
-/* Search */
 .srch{background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:6px 10px;font-size:12px;width:200px}
 .srch:focus{border-color:#4fc3f7;outline:none}
 
@@ -82,10 +76,8 @@ td a:hover{text-decoration:underline;color:#39ff14}
 <div id="loader" class="loading"><div class="spin"></div><br>Loading dashboard data...<br><span style="font-size:13px;color:#888">This may take 15-20 seconds</span></div>
 <div id="app" style="display:none">
 
-<!-- Cards -->
 <div class="cards" id="cards"></div>
 
-<!-- Filters -->
 <div class="fbox">
 <h3>Filters</h3>
 <div class="frow" id="filterRow">
@@ -97,7 +89,6 @@ td a:hover{text-decoration:underline;color:#39ff14}
 </div>
 </div>
 
-<!-- Charts -->
 <div class="chs">
   <div class="chb"><h3>Sales by Period</h3><canvas id="ch1"></canvas></div>
   <div class="chb"><h3>Stock Status</h3><canvas id="ch2"></canvas></div>
@@ -107,7 +98,6 @@ td a:hover{text-decoration:underline;color:#39ff14}
   <div class="chb"><h3>Active / Inactive</h3><canvas id="ch4"></canvas></div>
 </div>
 
-<!-- Table -->
 <div class="tbox">
 <h3>All SKU Data <span id="tcount"></span></h3>
 <div class="twrap">
@@ -130,73 +120,130 @@ td a:hover{text-decoration:underline;color:#39ff14}
 </div>
 
 <script>
-// ========================================================
-var API_URL = 'https://script.google.com/macros/s/AKfycby-O40MaoS8hea5zTGsb1eMtUWJt_e8TkNG0SDYa6kuvwou7ELAEnHGWXJTGJUDX8maUw/exec';
-// ========================================================
+var API_URL='https://script.google.com/macros/s/AKfycby-O40MaoS8hea5zTGsb1eMtUWJt_e8TkNG0SDYa6kuvwou7ELAEnHGWXJTGJUDX8maUw/exec';
 
-var ALL_DATA=[], HEADERS=[], FILTERED=[], SORT_COL=-1, SORT_DIR=1, PAGE=0, PER_PAGE=100;
-var STOCK_COL=12, ACTIVE_COL=13;
+var ALL_DATA=[],HEADERS=[],FILTERED=[],SORT_COL=-1,SORT_DIR=1,PAGE=0,PER_PAGE=100;
+var STOCK_COL=12,ACTIVE_COL=13;
 var SORTABLE_FROM=15;
 var CHS={};
-// Columns that contain ratings (0-based) — will detect dynamically
 var RATING_COLS=[];
+var NUMERIC_COLS=[]; // columns that are numeric (for low-high/high-low filters)
 
+// ===== LOAD DATA - Using script tag approach for Google Apps Script CORS =====
 function loadData(){
   document.getElementById('loader').style.display='block';
   document.getElementById('app').style.display='none';
-  fetch(API_URL,{redirect:'follow'})
-    .then(function(r){return r.json()})
-    .then(function(d){
-      if(d.error){onErr(d.error);return;}
-      ALL_DATA=d.rows||[];
-      HEADERS=d.headers||[];
-      detectRatingCols();
-      document.getElementById('loader').style.display='none';
-      document.getElementById('app').style.display='block';
-      buildColumnFilters();
-      applyAll();
-      document.getElementById('lastUp').textContent='Updated: '+new Date().toLocaleString();
-      document.getElementById('info').textContent=ALL_DATA.length+' SKUs | '+HEADERS.length+' columns';
+  document.getElementById('loader').innerHTML='<div class="spin"></div><br>Loading dashboard data...<br><span style="font-size:13px;color:#888">This may take 15-20 seconds</span>';
+
+  // Method 1: Try fetch first
+  fetch(API_URL,{redirect:'follow',headers:{'Accept':'application/json'}})
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.text();
     })
-    .catch(function(e){onErr(e.message||'Network error')});
+    .then(function(txt){
+      // Google Apps Script sometimes returns HTML redirect, parse carefully
+      var d;
+      try{ d=JSON.parse(txt); }
+      catch(e){
+        // If HTML returned, try extracting JSON or use fallback
+        throw new Error('Invalid JSON response. Try opening this URL directly: '+API_URL);
+      }
+      onDataLoaded(d);
+    })
+    .catch(function(e){
+      // Method 2: Fallback using script injection (JSONP-like)
+      console.log('Fetch failed: '+e.message+', trying callback method...');
+      loadViaCallback();
+    });
 }
 
-function onErr(msg){document.getElementById('loader').innerHTML='<div style="color:#dc2f02">Error: '+msg+'</div>';}
+// Fallback: Load via hidden iframe + postMessage or direct script
+function loadViaCallback(){
+  var callbackName='gascb_'+Date.now();
+  window[callbackName]=function(d){
+    onDataLoaded(d);
+    delete window[callbackName];
+  };
+  // Try with XMLHttpRequest which handles redirects differently
+  var xhr=new XMLHttpRequest();
+  xhr.open('GET',API_URL,true);
+  xhr.onload=function(){
+    if(xhr.status===200){
+      try{
+        var d=JSON.parse(xhr.responseText);
+        onDataLoaded(d);
+      }catch(e){
+        onErr('Could not parse data. Please check if the web app URL is correct and deployed as "Anyone".');
+      }
+    }else{
+      onErr('Server returned status '+xhr.status+'. Make sure the Apps Script is deployed as Web App with access "Anyone".');
+    }
+  };
+  xhr.onerror=function(){
+    onErr('Network error. Please check: 1) Apps Script is deployed as Web App 2) Access is set to "Anyone" 3) Try opening this URL directly in a new tab: <a href="'+API_URL+'" target="_blank" style="color:#4fc3f7">Test API URL</a>');
+  };
+  xhr.send();
+}
 
-// Detect rating columns (headers containing "RATING" or "STAR")
+function onDataLoaded(d){
+  if(d.error){onErr(d.error);return;}
+  ALL_DATA=d.rows||[];
+  HEADERS=d.headers||[];
+  detectRatingCols();
+  detectNumericCols();
+  document.getElementById('loader').style.display='none';
+  document.getElementById('app').style.display='block';
+  buildColumnFilters();
+  applyAll();
+  document.getElementById('lastUp').textContent='Updated: '+new Date().toLocaleString();
+  document.getElementById('info').textContent=ALL_DATA.length+' SKUs | '+HEADERS.length+' columns';
+}
+
+function onErr(msg){document.getElementById('loader').innerHTML='<div style="color:#dc2f02;font-size:14px">'+msg+'</div>';}
+
+// Detect rating columns
 function detectRatingCols(){
   RATING_COLS=[];
   for(var i=0;i<HEADERS.length;i++){
     var h=String(HEADERS[i]||'').toUpperCase();
-    if(h.indexOf('RATING')>=0||h.indexOf('STAR')>=0||h.indexOf('REVIEW')>=0){
-      RATING_COLS.push(i);
-    }
+    if(h.indexOf('RATING')>=0||h.indexOf('STAR')>=0||h.indexOf('REVIEW')>=0) RATING_COLS.push(i);
   }
 }
 
-// ===== BUILD FILTERS FOR EVERY COLUMN =====
+// Detect numeric columns (for low-high/high-low sort)
+function detectNumericCols(){
+  NUMERIC_COLS=[];
+  for(var c=0;c<HEADERS.length;c++){
+    var numCount=0,total=0;
+    for(var r=0;r<ALL_DATA.length&&r<500;r++){
+      var v=ALL_DATA[r][c];
+      if(v===''||v===null||v===undefined) continue;
+      total++;
+      if(!isNaN(Number(v))) numCount++;
+    }
+    if(total>0 && numCount/total>0.7) NUMERIC_COLS.push(c);
+  }
+}
+
+// ===== BUILD FILTERS =====
 function buildColumnFilters(){
   var colSets=[];
   for(var c=0;c<HEADERS.length;c++){
     var hdr=String(HEADERS[c]||'').trim();
     if(!hdr){colSets.push(null);continue;}
-    var isNumeric=true;
+
+    // If numeric column → will get sort options instead of value dropdown
+    if(NUMERIC_COLS.indexOf(c)>=0){colSets.push('NUMERIC');continue;}
+
     var vals={};
     var uniqueCount=0;
-    for(var r=0;r<ALL_DATA.length&&r<1000;r++){
-      var v=String(ALL_DATA[r][c]||'').trim();
-      if(v===''||v==='0') continue;
-      if(isNaN(Number(v))) isNumeric=false;
-      if(!vals[v]){vals[v]=1;uniqueCount++;}
-    }
-    if(isNumeric && uniqueCount>20){colSets.push(null);continue;}
-    if(uniqueCount>200){colSets.push(null);continue;}
-    var allVals={};
     for(var r=0;r<ALL_DATA.length;r++){
       var v=String(ALL_DATA[r][c]||'').trim();
-      if(v) allVals[v]=1;
+      if(v){if(!vals[v]){vals[v]=1;uniqueCount++;}}
     }
-    colSets.push(Object.keys(allVals).sort());
+    if(uniqueCount>200||uniqueCount<2){colSets.push(null);continue;}
+    colSets.push(Object.keys(vals).sort());
   }
 
   var frow=document.getElementById('filterRow');
@@ -211,10 +258,21 @@ function buildColumnFilters(){
     sel.setAttribute('data-col',c);
     sel.style.cssText='background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
     var hdr=String(HEADERS[c]||'').trim().toUpperCase();
-    sel.innerHTML='<option value="">'+hdr+'</option>';
-    var items=colSets[c];
-    for(var i=0;i<items.length;i++){
-      sel.innerHTML+='<option value="'+items[i].replace(/"/g,'&quot;')+'">'+items[i]+'</option>';
+
+    if(colSets[c]==='NUMERIC'){
+      // Numeric column: Low→High / High→Low sort options
+      sel.setAttribute('data-type','numeric');
+      sel.innerHTML='<option value="">'+hdr+'</option>';
+      sel.innerHTML+='<option value="low-high">Low → High</option>';
+      sel.innerHTML+='<option value="high-low">High → Low</option>';
+    }else{
+      // Text column: value dropdown
+      sel.setAttribute('data-type','text');
+      sel.innerHTML='<option value="">'+hdr+'</option>';
+      var items=colSets[c];
+      for(var i=0;i<items.length;i++){
+        sel.innerHTML+='<option value="'+items[i].replace(/"/g,'&quot;')+'">'+items[i]+'</option>';
+      }
     }
     sel.onchange=applyAll;
     frow.insertBefore(sel,searchBox);
@@ -231,11 +289,21 @@ function clearFilters(){
 
 // ===== APPLY ALL FILTERS + SORT =====
 function applyAll(){
-  var activeFilters=[];
+  var textFilters=[];
+  var numSort=null; // {col, dir} from numeric dropdown
   var sels=document.querySelectorAll('.col-filter');
   for(var i=0;i<sels.length;i++){
     var val=sels[i].value;
-    if(val) activeFilters.push({col:parseInt(sels[i].getAttribute('data-col')),val:val.toUpperCase()});
+    if(!val) continue;
+    var col=parseInt(sels[i].getAttribute('data-col'));
+    var type=sels[i].getAttribute('data-type');
+    if(type==='numeric'){
+      // Numeric sort
+      numSort={col:col,dir:val==='low-high'?1:-1};
+    }else{
+      // Text filter
+      textFilters.push({col:col,val:val.toUpperCase()});
+    }
   }
   var sq=document.getElementById('searchBox').value.trim().toUpperCase();
 
@@ -243,8 +311,8 @@ function applyAll(){
   for(var i=0;i<ALL_DATA.length;i++){
     var r=ALL_DATA[i];
     var pass=true;
-    for(var f=0;f<activeFilters.length;f++){
-      if(String(r[activeFilters[f].col]||'').trim().toUpperCase()!==activeFilters[f].val){pass=false;break;}
+    for(var f=0;f<textFilters.length;f++){
+      if(String(r[textFilters[f].col]||'').trim().toUpperCase()!==textFilters[f].val){pass=false;break;}
     }
     if(!pass) continue;
     if(sq){
@@ -255,11 +323,19 @@ function applyAll(){
     FILTERED.push(r);
   }
 
+  // Apply numeric dropdown sort (takes priority over header click sort)
+  if(numSort){
+    SORT_COL=numSort.col;
+    SORT_DIR=numSort.dir;
+  }
+
   if(SORT_COL>=0){
     FILTERED.sort(function(a,b){
       var va=a[SORT_COL],vb=b[SORT_COL];
       var na=parseFloat(va),nb=parseFloat(vb);
-      if(!isNaN(na)&&!isNaN(nb)) return (na-nb)*SORT_DIR;
+      if(isNaN(na)) na=-999999;
+      if(isNaN(nb)) nb=-999999;
+      if(!isNaN(parseFloat(va))&&!isNaN(parseFloat(vb))) return (na-nb)*SORT_DIR;
       va=String(va||'').toUpperCase();vb=String(vb||'').toUpperCase();
       if(va<vb)return -1*SORT_DIR;if(va>vb)return 1*SORT_DIR;return 0;
     });
@@ -294,14 +370,12 @@ function renderCards(){
     if(ac==='INACTIVE')inact++;else act++;
   }
   var h='';
-  // Row 1: Total SKUs + Sales data
   h+=mkcd('Total SKUs',fmt(d.length),'');
   h+=mkcd('Today Sales',fmt(tdy),'g');
   h+=mkcd('3-Day Sales',fmt(d3),'g');
   h+=mkcd('7-Day Sales',fmt(d7),'o');
   h+=mkcd('15-Day Sales',fmt(d15),'o');
   h+=mkcd('30-Day Sales',fmt(d30),'p');
-  // Row 2: Stock + Active (below sales)
   h+=mkcd('In Stock',fmt(ins),'g');
   h+=mkcd('Out of Stock',fmt(oos),'r');
   h+=mkcd('Active',fmt(act),'g');
@@ -354,81 +428,4 @@ function renderCharts(){
   for(var i=0;i<platArr.length;i++){pl.push(platArr[i].n);pv.push(platArr[i].v);}
   dc('ch3');CHS.ch3=new Chart(document.getElementById('ch3'),{type:'bar',data:{labels:pl,datasets:[{data:pv,backgroundColor:pc.slice(0,pl.length),borderRadius:5}]},options:bOpts()});
 
-  dc('ch4');CHS.ch4=new Chart(document.getElementById('ch4'),{type:'doughnut',data:{labels:['Active','Inactive'],datasets:[{data:[actCount,inactCount],backgroundColor:['#39ff14','#dc2f02'],borderWidth:0}]},options:pOpts()});
-}
-
-function bOpts(){return{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{color:'#222'}},y:{ticks:{color:'#888',font:{size:10}},grid:{color:'#222'}}}}}
-function pOpts(){return{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#eee',padding:10,font:{size:10}}}}}}
-function dc(id){if(CHS[id]){CHS[id].destroy();CHS[id]=null;}}
-
-// ===== CHECK IF VALUE IS A URL =====
-function isUrl(v){
-  var s=String(v||'').trim();
-  return s.indexOf('http://')===0||s.indexOf('https://')===0||s.indexOf('www.')===0;
-}
-
-function makeLink(v){
-  var s=String(v||'').trim();
-  var href=s;
-  if(s.indexOf('www.')===0) href='https://'+s;
-  // Shorten display text
-  var display=s.replace(/^https?:\/\//,'').replace(/^www\./,'');
-  if(display.length>30) display=display.substring(0,30)+'...';
-  return '<a href="'+href+'" target="_blank" rel="noopener">'+display+'</a>';
-}
-
-// ===== CHECK IF VALUE SHOULD BE RED =====
-function isRedValue(val, colIdx){
-  var v=val;
-  var num=parseFloat(v);
-
-  // 0 or empty in numeric columns (P onwards = index 15+)
-  if(colIdx>=SORTABLE_FROM){
-    if(v===0||v==='0'||v===''||v===null||v===undefined) return true;
-  }
-
-  // Ratings below 3.5
-  if(RATING_COLS.indexOf(colIdx)>=0){
-    if(!isNaN(num) && num<3.5 && num>=0) return true;
-  }
-
-  return false;
-}
-
-// ===== TABLE =====
-function renderTable(){
-  PER_PAGE=parseInt(document.getElementById('ppSelect').value)||100;
-  var th='';
-  for(var i=0;i<HEADERS.length;i++){
-    var isSortable=i>=SORTABLE_FROM;
-    var arrow='';
-    if(SORT_COL===i) arrow='<span class="arrow">'+(SORT_DIR===1?'\u25B2':'\u25BC')+'</span>';
-    if(isSortable){
-      th+='<th class="sortable" onclick="sortBy('+i+')">'+HEADERS[i]+arrow+'</th>';
-    }else{
-      th+='<th>'+HEADERS[i]+'</th>';
-    }
-  }
-  document.getElementById('thead').innerHTML=th;
-
-  var start=PAGE*PER_PAGE;
-  var end=Math.min(start+PER_PAGE,FILTERED.length);
-  var totalPages=Math.ceil(FILTERED.length/PER_PAGE)||1;
-  var tb='';
-  for(var i=start;i<end;i++){
-    var r=FILTERED[i];
-    tb+='<tr>';
-    for(var j=0;j<r.length;j++){
-      var val=r[j];
-      var cellClass='';
-      var cellContent='';
-
-      // Badge for Stock column
-      if(j===STOCK_COL){
-        var su=String(val||'').trim().toUpperCase();
-        cellContent=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';
-      }
-      // Badge for Active column
-      else if(j===ACTIVE_COL){
-        var au=String(val||'').trim().toUpperCase();
-        cellContent=au==='INACTIVE'?'<span class="badge br">INACTIVE</span>':'<
+  dc('ch4');CHS.ch4=new Chart(document.getElementById('ch4'),{type:'doughnut',data:{labels:['Active','I
