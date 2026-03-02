@@ -268,7 +268,7 @@ function onDataLoaded(d){
   document.getElementById('app').style.display='block';
   document.getElementById('lastUp').textContent='Updated: '+new Date().toLocaleString();
   document.getElementById('info').textContent='SKU WISE SALES';
-  renderCards();buildColumnFilters();applyAll();
+  buildColumnFilters();applyAll();
 }
 function onErr(msg){document.getElementById('loader').innerHTML='<div style="color:#dc2f02;font-size:14px">'+msg+'</div>';}
 function fmt(n){return n==null?'0':Number(n).toLocaleString('en-IN');}
@@ -319,8 +319,7 @@ function filterByType(type,dataset){
 
 // ===== RENDER CARDS =====
 function renderCards(){
-  // Use FILTERED if available, otherwise ALL_DATA (on first load before filters)
-  var data=(FILTERED&&FILTERED.length>0)?FILTERED:ALL_DATA;
+  var data=FILTERED;
   var ci=getSalesIndexes();
   var tdy=0,d3=0,d7=0,d15=0,d30=0;
   for(var i=0;i<data.length;i++){
@@ -389,8 +388,7 @@ function mkcard(label,value,cc,type){
 
 // ===== MODAL DRILL-DOWN =====
 function openDrill(type,label){
-  var data=(FILTERED&&FILTERED.length>0)?FILTERED:ALL_DATA;
-  M={level:1,type:type,label:label,platform:'',filtered:filterByType(type,data),skuList:[],skuFiltered:[],sortCol:-1,sortDir:1,page:0};
+  M={level:1,type:type,label:label,platform:'',filtered:filterByType(type,FILTERED),skuList:[],skuFiltered:[],sortCol:-1,sortDir:1,page:0};
   document.getElementById('modalTitle').textContent=label+' - Platform Breakdown';
   document.getElementById('modalNav').style.display='none';
   renderDrillPlatforms();
@@ -835,4 +833,30 @@ function renderTable(){
   for(var i=start;i<end;i++){var r=FILTERED[i];tb+='<tr>';
     for(var j=0;j<r.length;j++){var val=r[j];var cc='';var ct='';
       if(j===STOCK_COL){var su=String(val||'').trim().toUpperCase();ct=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';}
-      else if(j===ACTIVE_COL){var au=String(val||'').trim().toUpperCase();ct=au==='INACTIVE'?'<span class="badge br">INACTIVE</span>':'<span class
+      else if(j===ACTIVE_COL){var au=String(val||'').trim().toUpperCase();ct=au==='INACTIVE'?'<span class="badge br">INACTIVE</span>':'<span class="badge bg">'+val+'</span>';}
+      else if(isUrl(val)){ct=makeLink(val);}
+      else if(isRedVal(val,j)){cc=' class="zero"';ct=(val===''||val===null||val===undefined)?'0':val;}
+      else{ct=(val===null||val===undefined)?'':val;}
+      tb+='<td'+cc+'>'+ct+'</td>';}tb+='</tr>';}
+  document.getElementById('tbody').innerHTML=tb||'<tr><td colspan="'+HEADERS.length+'" style="text-align:center;color:#888;padding:20px">No data</td></tr>';
+  document.getElementById('ttotal').textContent='Total: '+fmt(FILTERED.length);
+  document.getElementById('tcount').textContent='Showing '+(FILTERED.length>0?start+1:0)+'-'+end+' of '+FILTERED.length;
+  document.getElementById('pageInfo').textContent='Page '+(PAGE+1)+' of '+tp;
+  document.getElementById('prevBtn').disabled=PAGE===0;document.getElementById('nextBtn').disabled=end>=FILTERED.length;
+}
+function isRedVal(val,ci){if(ci>=SORTABLE_FROM){if(val===0||val==='0'||val===''||val===null||val===undefined)return true;}if(RATING_COLS.indexOf(ci)>=0){var n=parseFloat(val);if(!isNaN(n)&&n<3.5&&n>=0)return true;}return false;}
+function isUrl(v){var s=String(v||'').trim();return s.indexOf('http://')===0||s.indexOf('https://')===0||s.indexOf('www.')===0;}
+function makeLink(v){var s=String(v||'').trim();var href=s;if(s.indexOf('www.')===0)href='https://'+s;var d=s.replace(/^https?:\/\//,'').replace(/^www\./,'');if(d.length>30)d=d.substring(0,30)+'...';return'<a href="'+href+'" target="_blank" rel="noopener">'+d+'</a>';}
+function changePage(dir){PAGE+=dir;renderTable();}
+function changePageSize(){PAGE=0;renderTable();}
+function downloadMainCSV(){
+  if(!FILTERED.length){alert('No data!');return;}var csv=[];var hr=[];
+  for(var i=0;i<HEADERS.length;i++)hr.push('"'+String(HEADERS[i]||'').replace(/"/g,'""')+'"');csv.push(hr.join(','));
+  for(var r=0;r<FILTERED.length;r++){var row=[];for(var c=0;c<FILTERED[r].length;c++){row.push('"'+String(FILTERED[r][c]===null||FILTERED[r][c]===undefined?'':FILTERED[r][c]).replace(/"/g,'""')+'"');}csv.push(row.join(','));}
+  var blob=new Blob([csv.join('\n')],{type:'text/csv;charset=utf-8;'});var link=document.createElement('a');link.href=URL.createObjectURL(blob);
+  link.download='SKU_WISE_SALES_'+new Date().toISOString().slice(0,10)+'.csv';link.click();URL.revokeObjectURL(link.href);
+}
+loadData();
+</script>
+</body>
+</html>
