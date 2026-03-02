@@ -144,14 +144,6 @@ td a:hover{text-decoration:underline;color:#39ff14}
 <div class="section-title">ACTION REQUIRED</div>
 <div class="cards" id="actionCards"></div>
 
-<!-- CARDS ROW 4: NEED TO OPEN SALES -->
-<div class="section-title" id="ntoTitle" style="display:none">NEED TO OPEN - SALES</div>
-<div class="cards" id="ntoSalesCards"></div>
-
-<!-- CARDS ROW 5: NEED TO CLOSE SALES -->
-<div class="section-title" id="ntcTitle" style="display:none">NEED TO CLOSE - SALES</div>
-<div class="cards" id="ntcSalesCards"></div>
-
 <!-- FILTERS -->
 <div class="fbox">
 <h3>Filters</h3>
@@ -350,37 +342,6 @@ function renderCards(){
   ah+=mkcard('Need To Close',fmt(ntcData.length),'r','needclose');
   document.getElementById('actionCards').innerHTML=ah;
 
-  // Need To Open - Sales breakdown
-  var ntoTitle=document.getElementById('ntoTitle');
-  var ntoCards=document.getElementById('ntoSalesCards');
-  if(ntoData.length>0){
-    ntoTitle.style.display='';
-    var nt=0,n3=0,n7=0,n15=0,n30=0;
-    for(var i=0;i<ntoData.length;i++){nt+=Number(ntoData[i][ci.today])||0;n3+=Number(ntoData[i][ci.day3])||0;n7+=Number(ntoData[i][ci.day7])||0;n15+=Number(ntoData[i][ci.day15])||0;n30+=Number(ntoData[i][ci.day30])||0;}
-    var nh='';
-    nh+=mkcard('NTO Today',fmt(nt),'pk','needopen');
-    nh+=mkcard('NTO 3-Day',fmt(n3),'pk','needopen');
-    nh+=mkcard('NTO 7-Day',fmt(n7),'pk','needopen');
-    nh+=mkcard('NTO 15-Day',fmt(n15),'pk','needopen');
-    nh+=mkcard('NTO 30-Day',fmt(n30),'pk','needopen');
-    ntoCards.innerHTML=nh;
-  } else {ntoTitle.style.display='none';ntoCards.innerHTML='';}
-
-  // Need To Close - Sales breakdown
-  var ntcTitle=document.getElementById('ntcTitle');
-  var ntcCards=document.getElementById('ntcSalesCards');
-  if(ntcData.length>0){
-    ntcTitle.style.display='';
-    var ct=0,c3=0,c7=0,c15=0,c30=0;
-    for(var i=0;i<ntcData.length;i++){ct+=Number(ntcData[i][ci.today])||0;c3+=Number(ntcData[i][ci.day3])||0;c7+=Number(ntcData[i][ci.day7])||0;c15+=Number(ntcData[i][ci.day15])||0;c30+=Number(ntcData[i][ci.day30])||0;}
-    var ch='';
-    ch+=mkcard('NTC Today',fmt(ct),'r','needclose');
-    ch+=mkcard('NTC 3-Day',fmt(c3),'r','needclose');
-    ch+=mkcard('NTC 7-Day',fmt(c7),'r','needclose');
-    ch+=mkcard('NTC 15-Day',fmt(c15),'r','needclose');
-    ch+=mkcard('NTC 30-Day',fmt(c30),'r','needclose');
-    ntcCards.innerHTML=ch;
-  } else {ntcTitle.style.display='none';ntcCards.innerHTML='';}
 }
 function mkcard(label,value,cc,type){
   return '<div class="cd '+cc+'" onclick="openDrill(\''+type+'\',\''+label.replace(/'/g,"\\'")+'\')"><div class="lb">'+label+'</div><div class="vl">'+value+'</div></div>';
