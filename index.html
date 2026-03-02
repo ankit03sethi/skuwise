@@ -120,7 +120,7 @@ td a:hover{text-decoration:underline;color:#39ff14}
 </div>
 
 <script>
-var API_URL='https://script.google.com/macros/s/AKfycbxZeM19bOvvjk3wyV2D1uo_AmUkxYMH6wOOAqy1eCmDZzOWiNLSsK6gan08nctK9xvkGg/exec';
+var API_URL='https://script.google.com/macros/s/AKfycbwwILh7WaqCvWftUSvDwbcUHwyREoETo_7lxIlrSG3ZOE1QFtthlU-VvJLZLfH4inGZ0g/exec';
 
 var ALL_DATA=[],HEADERS=[],FILTERED=[],SORT_COL=-1,SORT_DIR=1,PAGE=0,PER_PAGE=100;
 var STOCK_COL=12,ACTIVE_COL=13;
@@ -135,20 +135,43 @@ function loadData(){
   document.getElementById('app').style.display='none';
   document.getElementById('loader').innerHTML='<div class="spin"></div><br>Loading dashboard data...<br><span style="font-size:13px;color:#888">37,000+ SKUs — may take 30-60 seconds</span>';
 
-  fetch(API_URL,{redirect:'follow'})
+  // Add a 60-second timeout
+  var controller = new AbortController();
+  var timeoutId = setTimeout(function(){ controller.abort(); }, 60000);
+
+  fetch(API_URL,{redirect:'follow', signal: controller.signal})
     .then(function(r){
+      clearTimeout(timeoutId);
+      console.log('API Response status:', r.status, r.statusText);
+      console.log('API Response URL:', r.url);
+      if(!r.ok) throw new Error('HTTP ' + r.status + ' ' + r.statusText);
       return r.text();
     })
     .then(function(text){
+      console.log('Response length:', text.length, 'chars');
+      console.log('First 300 chars:', text.substring(0,300));
+      if(!text || text.trim().length === 0){
+        onErr('Empty response from API.<br><br>Make sure your Apps Script is deployed as:<br>• Execute as: <b>Me</b><br>• Who has access: <b>Anyone</b><br><br><a href="'+API_URL+'" target="_blank" style="color:#4fc3f7">Click here to test API directly</a>');
+        return;
+      }
+      // Check if response is HTML (login page) instead of JSON
+      if(text.trim().charAt(0) === '<'){
+        onErr('API returned HTML instead of JSON. This usually means:<br>• Apps Script is not deployed as web app<br>• Access is restricted (not set to "Anyone")<br><br>Response preview: <code>'+text.substring(0,150)+'</code><br><br><a href="'+API_URL+'" target="_blank" style="color:#4fc3f7">Click here to test API directly</a>');
+        return;
+      }
       try{
         var d=JSON.parse(text);
         onDataLoaded(d);
       }catch(e){
-        onErr('JSON parse error. Response length: '+text.length+' chars. First 200: '+text.substring(0,200));
+        onErr('JSON parse error: '+e.message+'<br>Response length: '+text.length+' chars.<br>First 200: <code>'+text.substring(0,200)+'</code>');
       }
     })
     .catch(function(e){
-      onErr('Fetch failed: '+e.message+'<br><br>Try opening API directly: <a href="'+API_URL+'" target="_blank" style="color:#4fc3f7">Click here to test</a>');
+      clearTimeout(timeoutId);
+      var msg = e.name === 'AbortError'
+        ? 'Request timed out after 60 seconds. The API is not responding.'
+        : 'Fetch failed: ' + e.message;
+      onErr(msg+'<br><br>Possible fixes:<br>• Check if Apps Script is deployed (Manage Deployments)<br>• Set access to "Anyone"<br>• Create a new deployment after code changes<br><br><a href="'+API_URL+'" target="_blank" style="color:#4fc3f7">Click here to test API directly</a>');
     });
 }
 
@@ -391,36 +414,4 @@ function renderCharts(){
   var platArr=[];for(var k in platMap)platArr.push({n:k,v:platMap[k]});
   platArr.sort(function(a,b){return b.v-a.v});
   var pl=[],pv=[],pc=['#4fc3f7','#39ff14','#e09f3e','#a855f7','#dc2f02','#f72585','#7209b7','#3a0ca3','#4361ee','#4cc9f0'];
-  for(var i=0;i<platArr.length;i++){pl.push(platArr[i].n);pv.push(platArr[i].v);}
-  dc('ch3');CHS.ch3=new Chart(document.getElementById('ch3'),{type:'bar',data:{labels:pl,datasets:[{data:pv,backgroundColor:pc.slice(0,pl.length),borderRadius:5}]},options:bOpts()});
-
-  dc('ch4');CHS.ch4=new Chart(document.getElementById('ch4'),{type:'doughnut',data:{labels:['Active','Inactive'],datasets:[{data:[actCount,inactCount],backgroundColor:['#39ff14','#dc2f02'],borderWidth:0}]},options:pOpts()});
-}
-
-function bOpts(){return{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{color:'#222'}},y:{ticks:{color:'#888',font:{size:10}},grid:{color:'#222'}}}}}
-function pOpts(){return{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#eee',padding:10,font:{size:10}}}}}}
-function dc(id){if(CHS[id]){CHS[id].destroy();CHS[id]=null;}}
-
-// ===== URL DETECTION =====
-function isUrl(v){var s=String(v||'').trim();return s.indexOf('http://')===0||s.indexOf('https://')===0||s.indexOf('www.')===0;}
-function makeLink(v){
-  var s=String(v||'').trim();
-  var href=s;if(s.indexOf('www.')===0)href='https://'+s;
-  var display=s.replace(/^https?:\/\//,'').replace(/^www\./,'');
-  if(display.length>30)display=display.substring(0,30)+'...';
-  return'<a href="'+href+'" target="_blank" rel="noopener">'+display+'</a>';
-}
-
-// ===== RED VALUE CHECK =====
-function isRedValue(val,colIdx){
-  var num=parseFloat(val);
-  if(colIdx>=SORTABLE_FROM){
-    if(val===0||val==='0'||val===''||val===null||val===undefined)return true;
-  }
-  if(RATING_COLS.indexOf(colIdx)>=0){
-    if(!isNaN(num)&&num<3.5&&num>=0)return true;
-  }
-  return false;
-}
-
-// ===== 
+  for(var i=0;i<platArr.length;i++){pl
