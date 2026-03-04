@@ -11,24 +11,24 @@ body{font-family:'Segoe UI',sans-serif;background:#1a1a2e;color:#eee;padding:12p
 .header-row{display:flex;justify-content:center;align-items:center;position:relative;margin-bottom:4px}
 h1{text-align:center;color:#39ff14;font-size:20px;letter-spacing:1px}
 .global-search-wrap{position:absolute;right:0;top:50%;transform:translateY(-50%)}
-.global-search{background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:8px;padding:8px 14px;font-size:13px;width:280px;transition:border-color .2s}
+.global-search{background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:8px;padding:8px 14px;font-size:13px;width:280px;transition:border-color .2s}
 .global-search:focus{border-color:#39ff14;outline:none;box-shadow:0 0 8px rgba(57,255,20,.3)}
-.global-search::placeholder{color:#555}
+.global-search::placeholder{color:#666}
 .sub{text-align:center;color:#39ff14;font-size:20px;margin-bottom:12px;letter-spacing:1px;font-weight:700}
 .loading{text-align:center;padding:80px;color:#4fc3f7;font-size:18px}
 .spin{display:inline-block;width:30px;height:30px;border:3px solid #333;border-top:3px solid #4fc3f7;border-radius:50%;animation:sp .8s linear infinite;margin-bottom:10px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .section-title{color:#4fc3f7;font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;padding-left:4px;font-weight:600}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:10px}
-.cd{background:#16213e;border-radius:10px;padding:10px;text-align:center;border-left:4px solid #4fc3f7;transition:.2s;cursor:pointer}
+.cd{background:#0d1a30;border-radius:10px;padding:10px;text-align:center;border-left:4px solid #4fc3f7;transition:.2s;cursor:pointer}
 .cd:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(79,195,247,.3);border-left-color:#fff}
 .cd.g{border-left-color:#39ff14}.cd.o{border-left-color:#e09f3e}.cd.r{border-left-color:#dc2f02}.cd.p{border-left-color:#a855f7}.cd.b{border-left-color:#4fc3f7}.cd.pk{border-left-color:#f72585}
-.cd .lb{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px}
+.cd .lb{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.5px}
 .cd .vl{font-size:20px;font-weight:700;color:#fff}
-.fbox{background:#16213e;border-radius:10px;padding:12px;margin-bottom:12px}
+.fbox{background:#0d1a30;border-radius:10px;padding:12px;margin-bottom:12px}
 .fbox h3{color:#4fc3f7;font-size:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
 .frow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.frow select{background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px}
+.frow select{background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px}
 .frow select:focus{border-color:#4fc3f7;outline:none}
 .fbtn{background:#39ff14;color:#1a1a2e;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer}
 .fbtn:hover{background:#2ed810}
@@ -36,90 +36,93 @@ h1{text-align:center;color:#39ff14;font-size:20px;letter-spacing:1px}
 .fbtn.clr{background:#dc2f02}.fbtn.clr:hover{background:#b02602}
 .fbtn.dl{background:#4fc3f7}.fbtn.dl:hover{background:#3ab0e0}
 .chs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.chb{background:#16213e;border-radius:10px;padding:12px}
+.chb{background:#0d1a30;border-radius:10px;padding:12px}
 .chb h3{color:#4fc3f7;font-size:11px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
 .chb canvas{max-height:240px}
-.tbox{background:#16213e;border-radius:10px;padding:12px;margin-bottom:12px;position:relative}
+.tbox{background:#0d1a30;border-radius:10px;padding:12px;margin-bottom:12px;position:relative}
 .tbox h3{color:#4fc3f7;font-size:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center}
 .tbox h3 span{color:#888;font-size:11px;font-weight:400}
 .twrap{overflow-x:auto;overflow-y:auto;max-height:500px;width:100%}
 table{border-collapse:collapse;font-size:11px;white-space:nowrap;min-width:100%}
-th{background:#0f3460;color:#4fc3f7;padding:6px 8px;text-align:left;position:sticky;top:0;z-index:2;cursor:default;user-select:none}
+th{background:#0a1e40;color:#4fc3f7;padding:6px 8px;text-align:left;position:sticky;top:0;z-index:2;cursor:default;user-select:none}
 th.sortable{cursor:pointer}
 th.sortable:hover{background:#1a4a80;color:#39ff14}
 th .arrow{margin-left:4px;font-size:10px;color:#39ff14}
-td{padding:5px 8px;border-bottom:1px solid #1a1a2e}
-tr:nth-child(even) td{background:#0f1a2e}
+td{padding:5px 8px;border-bottom:1px solid #1a1a2e;color:#ddd}
+tr:nth-child(even) td{background:#0a0f1e}
 tr:hover td{background:#1f2b47}
-.badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600}
-.bg{background:#39ff1422;color:#39ff14}
-.br{background:#dc2f0222;color:#dc2f02}
-.zero{color:#dc2f02;font-weight:700}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.3px}
+.bg{background:#143d14;color:#39ff14;border:1px solid #2a6b2a}
+.br{background:#3d1414;color:#ff4444;border:1px solid #6b2a2a}
+.zero{color:#ff4444;font-weight:700}
 td a{color:#4fc3f7;text-decoration:none}
 td a:hover{text-decoration:underline;color:#39ff14}
 .pag{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:10px}
-.pag button{background:#0f3460;color:#4fc3f7;border:1px solid #333;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer}
+.pag button{background:#0a1e40;color:#4fc3f7;border:1px solid #444;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer}
 .pag button:hover{background:#1a4a80}
 .pag button:disabled{opacity:.3;cursor:default}
-.pag span{color:#888;font-size:12px}
-.srch{background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:6px 10px;font-size:12px;width:200px}
+.pag span{color:#999;font-size:12px}
+.srch{background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:6px;padding:6px 10px;font-size:12px;width:200px}
 .srch:focus{border-color:#4fc3f7;outline:none}
-.ft{text-align:center;color:#444;font-size:10px;margin-top:8px}
+.ft{text-align:center;color:#555;font-size:10px;margin-top:8px}
 @media(max-width:768px){.chs{grid-template-columns:1fr}.cards{grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}.global-search{width:160px;font-size:11px;padding:6px 10px}}
 
 /* CUSTOM NUMERIC DROPDOWN */
 .num-dd-wrap{position:relative;display:inline-block}
-.num-dd-btn{background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.num-dd-btn{background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .num-dd-btn:hover{border-color:#4fc3f7}
 .num-dd-btn .dd-arrow{margin-left:4px;font-size:8px;color:#888}
 .num-dd-btn.active-filter{border-color:#39ff14;color:#39ff14}
-.num-dd-panel{display:none;position:absolute;top:100%;left:0;z-index:50;background:#0f1a2e;border:1px solid #4fc3f7;border-radius:8px;width:200px;padding:6px;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.num-dd-panel{display:none;position:absolute;top:100%;left:0;z-index:50;background:#0a0f1e;border:1px solid #4fc3f7;border-radius:8px;width:200px;padding:6px;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.8)}
 .num-dd-panel.show{display:block}
-.num-dd-search{width:100%;background:#1a1a2e;color:#eee;border:1px solid #333;border-radius:5px;padding:5px 8px;font-size:11px;margin-bottom:4px}
+.num-dd-search{width:100%;background:#1a1a2e;color:#eee;border:1px solid #444;border-radius:5px;padding:5px 8px;font-size:11px;margin-bottom:4px}
 .num-dd-search:focus{border-color:#4fc3f7;outline:none}
-.num-dd-search::placeholder{color:#555}
+.num-dd-search::placeholder{color:#666}
 .num-dd-sort{display:flex;flex-direction:column;gap:2px;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #333}
 .num-dd-sort-item{padding:5px 8px;font-size:11px;color:#eee;cursor:pointer;border-radius:4px;transition:.15s}
-.num-dd-sort-item:hover{background:#16213e;color:#4fc3f7}
-.num-dd-sort-item.selected{background:#39ff1422;color:#39ff14;font-weight:600}
-.num-dd-vals{max-height:180px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 #0f1a2e}
+.num-dd-sort-item:hover{background:#0d1a30;color:#4fc3f7}
+.num-dd-sort-item.selected{background:#143d14;color:#39ff14;font-weight:600}
+.num-dd-vals{max-height:180px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#444 #0a0f1e}
 .num-dd-vals::-webkit-scrollbar{width:5px}
-.num-dd-vals::-webkit-scrollbar-track{background:#0f1a2e}
-.num-dd-vals::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+.num-dd-vals::-webkit-scrollbar-track{background:#0a0f1e}
+.num-dd-vals::-webkit-scrollbar-thumb{background:#444;border-radius:3px}
 .num-dd-val-item{padding:4px 8px;font-size:11px;color:#ccc;cursor:pointer;border-radius:4px;transition:.15s}
-.num-dd-val-item:hover{background:#16213e;color:#4fc3f7}
-.num-dd-val-item.selected{background:#4fc3f722;color:#4fc3f7;font-weight:600}
+.num-dd-val-item:hover{background:#0d1a30;color:#4fc3f7}
+.num-dd-val-item.selected{background:#1a2d4a;color:#4fc3f7;font-weight:600}
 .num-dd-clear{width:100%;background:#dc2f02;color:#fff;border:none;border-radius:4px;padding:4px;font-size:10px;font-weight:600;cursor:pointer;margin-top:4px}
 .num-dd-clear:hover{background:#ff4444}
 
 /* MODAL STYLES */
-.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:100;overflow-y:auto;padding:20px}
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);z-index:100;overflow-y:auto;padding:20px}
 .modal-overlay.show{display:block}
-.modal-box{background:#1a1a2e;border:1px solid #333;border-radius:12px;max-width:1200px;margin:0 auto;padding:20px;position:relative;min-height:300px}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #333}
+.modal-box{background:#111827;border:1px solid #444;border-radius:12px;max-width:1200px;margin:0 auto;padding:20px;position:relative;min-height:300px}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #444}
 .modal-title{color:#39ff14;font-size:16px;font-weight:700}
 .modal-close{background:#dc2f02;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer}
 .modal-close:hover{background:#ff4444}
 .modal-nav{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .modal-back{background:#4fc3f7;color:#1a1a2e;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer}
 .modal-back:hover{background:#39ff14}
-.modal-bread{color:#888;font-size:12px}
+.modal-bread{color:#999;font-size:12px}
 .modal-bread span{color:#4fc3f7;font-weight:600}
 .drill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
-.drill-item{background:#16213e;border-radius:10px;padding:14px;text-align:center;border-left:4px solid #4fc3f7;cursor:pointer;transition:.2s}
+.drill-item{background:#0d1a30;border-radius:10px;padding:14px;text-align:center;border-left:4px solid #4fc3f7;cursor:pointer;transition:.2s}
 .drill-item:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(79,195,247,.3);border-left-color:#39ff14}
 .drill-item .di-name{font-size:12px;color:#eee;font-weight:600;margin-bottom:4px}
 .drill-item .di-count{font-size:22px;font-weight:700;color:#39ff14}
+.drill-item.all-item{border-left-color:#e09f3e;background:#1a1a0d}
+.drill-item.all-item:hover{border-left-color:#39ff14}
+.drill-item.all-item .di-name{color:#e09f3e}
 .modal-toolbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-.m-tbox{background:#16213e;border-radius:10px;padding:12px;position:relative}
+.m-tbox{background:#0d1a30;border-radius:10px;padding:12px;position:relative}
 .m-tbox h3{color:#4fc3f7;font-size:12px;margin-bottom:8px;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
-.m-tbox h3 span{color:#888;font-size:11px;font-weight:400}
+.m-tbox h3 span{color:#999;font-size:11px;font-weight:400}
 .m-twrap{overflow-x:auto;overflow-y:auto;max-height:400px;width:100%}
 .m-pag{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:10px}
-.m-pag button{background:#0f3460;color:#4fc3f7;border:1px solid #333;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer}
+.m-pag button{background:#0a1e40;color:#4fc3f7;border:1px solid #444;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer}
 .m-pag button:hover{background:#1a4a80}
 .m-pag button:disabled{opacity:.3;cursor:default}
-.m-pag span{color:#888;font-size:12px}
+.m-pag span{color:#999;font-size:12px}
 </style>
 </head>
 <body>
@@ -177,7 +180,7 @@ td a:hover{text-decoration:underline;color:#39ff14}
   <button id="prevBtn" onclick="changePage(-1)">&#60; Prev</button>
   <span id="pageInfo">Page 1</span>
   <button id="nextBtn" onclick="changePage(1)">Next &#62;</button>
-  <select id="ppSelect" onchange="changePageSize()" style="background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:4px;font-size:11px">
+  <select id="ppSelect" onchange="changePageSize()" style="background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:6px;padding:4px;font-size:11px">
     <option value="50">50/page</option>
     <option value="100" selected>100/page</option>
     <option value="200">200/page</option>
@@ -204,9 +207,9 @@ td a:hover{text-decoration:underline;color:#39ff14}
 </div>
 
 <!-- GLOBAL SEARCH RESULTS PANEL -->
-<div id="globalResultsPanel" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:90;overflow-y:auto;padding:20px">
-<div style="background:#1a1a2e;border:1px solid #333;border-radius:12px;max-width:1400px;margin:0 auto;padding:20px;position:relative">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #333">
+<div id="globalResultsPanel" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);z-index:90;overflow-y:auto;padding:20px">
+<div style="background:#111827;border:1px solid #444;border-radius:12px;max-width:1400px;margin:0 auto;padding:20px;position:relative">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #444">
     <div style="color:#39ff14;font-size:16px;font-weight:700" id="gResTitle">Search Results</div>
     <button class="modal-close" onclick="closeGlobalSearch()">X CLOSE</button>
   </div>
@@ -228,10 +231,20 @@ var NUMERIC_UNIQUE_VALS={};
 var numDDState={};
 
 // Modal state
-var M={level:0,type:'',label:'',platform:'',filtered:[],skuList:[],skuFiltered:[],sortCol:-1,sortDir:1,page:0};
+var M={level:0,type:'',label:'',hasReasonLevel:false,reason:'',platform:'',company:'',baseData:[],reasonData:[],platformData:[],skuList:[],skuFiltered:[],sortCol:-1,sortDir:1,page:0};
 
 // Global search state
 var G_TIMER=null,G_RESULTS=[],G_PAGE=0,G_SORT_COL=-1,G_SORT_DIR=1;
+
+// ===== HELPER: Check if value is "active" (valid number including 0) =====
+function isActiveValue(val){
+  if(val===0)return true;
+  if(val===''||val===null||val===undefined)return false;
+  var s=String(val).trim();
+  if(s==='')return false;
+  var n=Number(s);
+  return !isNaN(n)&&isFinite(n);
+}
 
 // ===== LOAD DATA =====
 function loadData(){
@@ -291,8 +304,8 @@ function filterByType(type,dataset){
     var activeNum=parseFloat(r[ACTIVE_COL]);
     switch(type){
       case 'total':result.push(r);break;
-      case 'active':if(active!=='INACTIVE'&&active!=='0'&&active!=='')result.push(r);break;
-      case 'inactive':if(active==='INACTIVE')result.push(r);break;
+      case 'active':if(isActiveValue(r[ACTIVE_COL]))result.push(r);break;
+      case 'inactive':if(!isActiveValue(r[ACTIVE_COL]))result.push(r);break;
       case 'instock':if(stock==='IN STOCK')result.push(r);break;
       case 'outofstock':if(stock!=='IN STOCK'&&stock!=='')result.push(r);break;
       case 'today':if((Number(r[ci.today])||0)>0)result.push(r);break;
@@ -301,9 +314,9 @@ function filterByType(type,dataset){
       case 'day15':if((Number(r[ci.day15])||0)>0)result.push(r);break;
       case 'day30':if((Number(r[ci.day30])||0)>0)result.push(r);break;
       case 'needopen':
-        if(stock==='IN STOCK'&&active!=='INACTIVE'){if(activeNum===0||active==='0')result.push(r);}break;
+        if(stock==='IN STOCK'&&!isActiveValue(r[ACTIVE_COL]))result.push(r);break;
       case 'needclose':
-        if(stock!=='IN STOCK'&&stock!==''&&active!=='INACTIVE'){if(!isNaN(activeNum)&&activeNum>0)result.push(r);}break;
+        if(stock!=='IN STOCK'&&stock!==''&&isActiveValue(r[ACTIVE_COL])&&activeNum>0)result.push(r);break;
     }
   }
   return result;
@@ -341,7 +354,6 @@ function renderCards(){
   ah+=mkcard('Need To Open',fmt(ntoData.length),'pk','needopen');
   ah+=mkcard('Need To Close',fmt(ntcData.length),'r','needclose');
   document.getElementById('actionCards').innerHTML=ah;
-
 }
 function mkcard(label,value,cc,type){
   return '<div class="cd '+cc+'" onclick="openDrill(\''+type+'\',\''+label.replace(/'/g,"\\'")+'\')"><div class="lb">'+label+'</div><div class="vl">'+value+'</div></div>';
@@ -349,10 +361,18 @@ function mkcard(label,value,cc,type){
 
 // ===== MODAL DRILL-DOWN =====
 function openDrill(type,label){
-  M={level:1,type:type,label:label,platform:'',filtered:filterByType(type,FILTERED),skuList:[],skuFiltered:[],sortCol:-1,sortDir:1,page:0};
-  document.getElementById('modalTitle').textContent=label+' - Platform Breakdown';
-  document.getElementById('modalNav').style.display='none';
-  renderDrillPlatforms();
+  var data=filterByType(type,FILTERED);
+  var hasReason=(type==='active'||type==='inactive');
+  M={level:1,type:type,label:label,hasReasonLevel:hasReason,reason:'',platform:'',company:'',baseData:data,reasonData:data,platformData:[],skuList:[],skuFiltered:[],sortCol:-1,sortDir:1,page:0};
+  if(hasReason){
+    document.getElementById('modalTitle').textContent=label+' - Stock Reason Breakdown';
+    document.getElementById('modalNav').style.display='none';
+    renderDrillReasons();
+  } else {
+    document.getElementById('modalTitle').textContent=label+' - Platform Breakdown';
+    document.getElementById('modalNav').style.display='none';
+    renderDrillPlatforms();
+  }
   document.getElementById('modalOverlay').className='modal-overlay show';
   document.body.style.overflow='hidden';
 }
@@ -361,9 +381,46 @@ function closeModal(){
   document.body.style.overflow='';
 }
 function modalGoBack(){
-  if(M.level<=1){closeModal();return;}
-  if(M.level===2){M.level=1;document.getElementById('modalTitle').textContent=M.label+' - Platform Breakdown';document.getElementById('modalNav').style.display='none';renderDrillPlatforms();return;}
-  if(M.level===3){M.level=2;document.getElementById('modalTitle').textContent=M.label+' - Companies';document.getElementById('modalNav').style.display='flex';document.getElementById('modalBread').innerHTML='<span>'+M.label+'</span> &rarr; <span>'+M.platform+'</span> &rarr; Companies';renderDrillCompanies();return;}
+  if(M.hasReasonLevel){
+    // Levels: 1=Reason, 2=Platform, 3=Company, 4=Table
+    if(M.level<=1){closeModal();return;}
+    if(M.level===2){
+      M.level=1;M.reason='';M.platform='';M.company='';
+      document.getElementById('modalTitle').textContent=M.label+' - Stock Reason Breakdown';
+      document.getElementById('modalNav').style.display='none';
+      renderDrillReasons();return;
+    }
+    if(M.level===3){
+      M.level=2;M.platform='';M.company='';
+      document.getElementById('modalTitle').textContent=M.label+(M.reason?' - '+M.reason:' - ALL Reasons')+' - Platforms';
+      document.getElementById('modalNav').style.display='flex';
+      document.getElementById('modalBread').innerHTML='<span>'+M.label+'</span> &rarr; <span>'+(M.reason||'ALL')+'</span>';
+      renderDrillPlatforms();return;
+    }
+    if(M.level===4){
+      M.level=3;M.company='';
+      document.getElementById('modalTitle').textContent=M.label+' - '+(M.platform||'ALL Platforms')+' - Companies';
+      document.getElementById('modalNav').style.display='flex';
+      document.getElementById('modalBread').innerHTML='<span>'+M.label+'</span> &rarr; <span>'+(M.reason||'ALL')+'</span> &rarr; <span>'+(M.platform||'ALL')+'</span>';
+      renderDrillCompanies();return;
+    }
+  } else {
+    // Levels: 1=Platform, 2=Company, 3=Table
+    if(M.level<=1){closeModal();return;}
+    if(M.level===2){
+      M.level=1;M.platform='';M.company='';
+      document.getElementById('modalTitle').textContent=M.label+' - Platform Breakdown';
+      document.getElementById('modalNav').style.display='none';
+      renderDrillPlatforms();return;
+    }
+    if(M.level===3){
+      M.level=2;M.company='';
+      document.getElementById('modalTitle').textContent=M.label+' - '+(M.platform||'ALL Platforms')+' - Companies';
+      document.getElementById('modalNav').style.display='flex';
+      document.getElementById('modalBread').innerHTML='<span>'+M.label+'</span> &rarr; <span>'+(M.platform||'ALL')+'</span>';
+      renderDrillCompanies();return;
+    }
+  }
 }
 function groupBy(data,col){
   var map={};
@@ -371,10 +428,49 @@ function groupBy(data,col){
   var arr=[];for(var k in map)arr.push({name:k,count:map[k]});
   arr.sort(function(a,b){return b.count-a.count;});return arr;
 }
-function renderDrillPlatforms(){
-  var platforms=groupBy(M.filtered,PLATFORM_COL);
+
+// ===== REASON LEVEL (Column M) for Active/Inactive =====
+function renderDrillReasons(){
+  var reasons=groupBy(M.baseData,STOCK_COL);
   var colors=['#4fc3f7','#39ff14','#e09f3e','#a855f7','#dc2f02','#f72585','#7209b7','#3a0ca3'];
   var h='<div class="drill-grid">';
+  // ALL option first
+  h+='<div class="drill-item all-item" onclick="drillToReason(\'\')">';
+  h+='<div class="di-name">ALL</div><div class="di-count">'+fmt(M.baseData.length)+'</div></div>';
+  for(var i=0;i<reasons.length;i++){
+    var p=reasons[i];
+    h+='<div class="drill-item" style="border-left-color:'+colors[i%colors.length]+'" onclick="drillToReason(\''+p.name.replace(/'/g,"\\'")+'\')">';
+    h+='<div class="di-name">'+p.name+'</div><div class="di-count">'+fmt(p.count)+'</div></div>';
+  }
+  h+='</div>';
+  document.getElementById('modalContent').innerHTML=h;
+}
+function drillToReason(reason){
+  M.level=2;M.reason=reason;
+  if(reason){
+    M.reasonData=[];
+    for(var i=0;i<M.baseData.length;i++){
+      var v=String(M.baseData[i][STOCK_COL]||'').trim()||'(blank)';
+      if(v===reason)M.reasonData.push(M.baseData[i]);
+    }
+  } else {
+    M.reasonData=M.baseData.slice();
+  }
+  document.getElementById('modalTitle').textContent=M.label+' - '+(reason||'ALL Reasons')+' - Platforms';
+  document.getElementById('modalNav').style.display='flex';
+  document.getElementById('modalBread').innerHTML='<span>'+M.label+'</span> &rarr; <span>'+(reason||'ALL')+'</span>';
+  renderDrillPlatforms();
+}
+
+// ===== PLATFORM LEVEL =====
+function renderDrillPlatforms(){
+  var src=M.hasReasonLevel?M.reasonData:M.baseData;
+  var platforms=groupBy(src,PLATFORM_COL);
+  var colors=['#4fc3f7','#39ff14','#e09f3e','#a855f7','#dc2f02','#f72585','#7209b7','#3a0ca3'];
+  var h='<div class="drill-grid">';
+  // ALL option first
+  h+='<div class="drill-item all-item" onclick="drillToPlatform(\'\')">';
+  h+='<div class="di-name">ALL</div><div class="di-count">'+fmt(src.length)+'</div></div>';
   for(var i=0;i<platforms.length;i++){
     var p=platforms[i];
     h+='<div class="drill-item" style="border-left-color:'+colors[i%colors.length]+'" onclick="drillToPlatform(\''+p.name.replace(/'/g,"\\'")+'\')">';
@@ -384,18 +480,33 @@ function renderDrillPlatforms(){
   document.getElementById('modalContent').innerHTML=h;
 }
 function drillToPlatform(platform){
-  M.level=2;M.platform=platform;
-  document.getElementById('modalTitle').textContent=M.label+' - '+platform+' - Companies';
+  var nextLevel=M.hasReasonLevel?3:2;
+  M.level=nextLevel;M.platform=platform;
+  var src=M.hasReasonLevel?M.reasonData:M.baseData;
+  if(platform){
+    M.platformData=[];
+    for(var i=0;i<src.length;i++){if(String(src[i][PLATFORM_COL]||'').trim()===platform)M.platformData.push(src[i]);}
+  } else {
+    M.platformData=src.slice();
+  }
+  var title=M.label+' - '+(platform||'ALL Platforms')+' - Companies';
+  document.getElementById('modalTitle').textContent=title;
   document.getElementById('modalNav').style.display='flex';
-  document.getElementById('modalBread').innerHTML='<span>'+M.label+'</span> &rarr; <span>'+platform+'</span>';
+  var bread='<span>'+M.label+'</span>';
+  if(M.hasReasonLevel)bread+=' &rarr; <span>'+(M.reason||'ALL')+'</span>';
+  bread+=' &rarr; <span>'+(platform||'ALL')+'</span>';
+  document.getElementById('modalBread').innerHTML=bread;
   renderDrillCompanies();
 }
+
+// ===== COMPANY LEVEL =====
 function renderDrillCompanies(){
-  var filtered=[];
-  for(var i=0;i<M.filtered.length;i++){if(String(M.filtered[i][PLATFORM_COL]||'').trim()===M.platform)filtered.push(M.filtered[i]);}
-  var companies=groupBy(filtered,COMPANY_COL);
+  var companies=groupBy(M.platformData,COMPANY_COL);
   var colors=['#4fc3f7','#39ff14','#e09f3e','#a855f7','#dc2f02','#f72585','#7209b7'];
   var h='<div class="drill-grid">';
+  // ALL option first
+  h+='<div class="drill-item all-item" onclick="drillToCompany(\'\')">';
+  h+='<div class="di-name">ALL</div><div class="di-count">'+fmt(M.platformData.length)+'</div></div>';
   for(var i=0;i<companies.length;i++){
     var c=companies[i];
     h+='<div class="drill-item" style="border-left-color:'+colors[i%colors.length]+'" onclick="drillToCompany(\''+c.name.replace(/'/g,"\\'")+'\')">';
@@ -405,16 +516,24 @@ function renderDrillCompanies(){
   document.getElementById('modalContent').innerHTML=h;
 }
 function drillToCompany(company){
-  M.level=3;M.company=company;
-  M.skuList=[];
-  for(var i=0;i<M.filtered.length;i++){
-    var r=M.filtered[i];
-    if(String(r[PLATFORM_COL]||'').trim()===M.platform&&String(r[COMPANY_COL]||'').trim()===company)M.skuList.push(r);
+  var nextLevel=M.hasReasonLevel?4:3;
+  M.level=nextLevel;M.company=company;
+  if(company){
+    M.skuList=[];
+    for(var i=0;i<M.platformData.length;i++){
+      if(String(M.platformData[i][COMPANY_COL]||'').trim()===company)M.skuList.push(M.platformData[i]);
+    }
+  } else {
+    M.skuList=M.platformData.slice();
   }
   M.skuFiltered=M.skuList.slice();M.sortCol=-1;M.sortDir=1;M.page=0;
-  document.getElementById('modalTitle').textContent=M.label+' - '+M.platform+' - '+company;
+  var title=M.label+' - '+(M.platform||'ALL')+' - '+(company||'ALL Companies');
+  document.getElementById('modalTitle').textContent=title;
   document.getElementById('modalNav').style.display='flex';
-  document.getElementById('modalBread').innerHTML='<span>'+M.label+'</span> &rarr; <span>'+M.platform+'</span> &rarr; <span>'+company+'</span>';
+  var bread='<span>'+M.label+'</span>';
+  if(M.hasReasonLevel)bread+=' &rarr; <span>'+(M.reason||'ALL')+'</span>';
+  bread+=' &rarr; <span>'+(M.platform||'ALL')+'</span> &rarr; <span>'+(company||'ALL')+'</span>';
+  document.getElementById('modalBread').innerHTML=bread;
   renderModalTable();
 }
 function renderModalTable(){
@@ -451,7 +570,7 @@ function renderModalTable(){
     for(var j=0;j<r.length;j++){
       var val=r[j];var cc='';var ct='';
       if(j===STOCK_COL){var su=String(val||'').trim().toUpperCase();ct=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';}
-      else if(j===ACTIVE_COL){var au=String(val||'').trim().toUpperCase();ct=au==='INACTIVE'?'<span class="badge br">INACTIVE</span>':'<span class="badge bg">'+val+'</span>';}
+      else if(j===ACTIVE_COL){ct=isActiveValue(val)?'<span class="badge bg">'+val+'</span>':'<span class="badge br">'+(val===''||val===null||val===undefined?'BLANK':val)+'</span>';}
       else if(isUrl(val)){ct=makeLink(val);}
       else if(j>=SORTABLE_FROM&&(val===0||val==='0'||val===''||val===null||val===undefined)){cc=' class="zero"';ct=(val===''||val===null||val===undefined)?'0':val;}
       else{ct=(val===null||val===undefined)?'':val;}
@@ -476,7 +595,7 @@ function downloadModalCSV(){
   for(var r=0;r<data.length;r++){var row=[];for(var c=0;c<data[r].length;c++){row.push('"'+String(data[r][c]===null||data[r][c]===undefined?'':data[r][c]).replace(/"/g,'""')+'"');}csv.push(row.join(','));}
   var blob=new Blob([csv.join('\n')],{type:'text/csv;charset=utf-8;'});
   var link=document.createElement('a');link.href=URL.createObjectURL(blob);
-  link.download='SKU_'+M.label.replace(/\s+/g,'_')+'_'+M.platform+'_'+new Date().toISOString().slice(0,10)+'.csv';
+  link.download='SKU_'+M.label.replace(/\s+/g,'_')+'_'+(M.platform||'ALL')+'_'+new Date().toISOString().slice(0,10)+'.csv';
   link.click();URL.revokeObjectURL(link.href);
 }
 
@@ -530,7 +649,7 @@ function renderGlobalResults(){
     for(var j=0;j<r.length;j++){
       var val=r[j];var cc='';var ct='';
       if(j===STOCK_COL){var su=String(val||'').trim().toUpperCase();ct=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';}
-      else if(j===ACTIVE_COL){var au=String(val||'').trim().toUpperCase();ct=au==='INACTIVE'?'<span class="badge br">INACTIVE</span>':'<span class="badge bg">'+val+'</span>';}
+      else if(j===ACTIVE_COL){ct=isActiveValue(val)?'<span class="badge bg">'+val+'</span>':'<span class="badge br">'+(val===''||val===null||val===undefined?'BLANK':val)+'</span>';}
       else if(isUrl(val)){ct=makeLink(val);}
       else if(j>=SORTABLE_FROM&&(val===0||val==='0'||val===''||val===null||val===undefined)){cc=' class="zero"';ct=(val===''||val===null||val===undefined)?'0':val;}
       else{ct=(val===null||val===undefined)?'':val;}
@@ -560,7 +679,7 @@ function downloadGlobalCSV(){
   link.download='SKU_GlobalSearch_'+new Date().toISOString().slice(0,10)+'.csv';link.click();URL.revokeObjectURL(link.href);
 }
 
-// ===== MAIN TABLE (OLD DASHBOARD) =====
+// ===== MAIN TABLE =====
 function detectRatingCols(){RATING_COLS=[];for(var i=0;i<HEADERS.length;i++){var h=String(HEADERS[i]||'').toUpperCase();if(h.indexOf('RATING')>=0||h.indexOf('STAR')>=0||h.indexOf('REVIEW')>=0)RATING_COLS.push(i);}}
 function detectNumericCols(){NUMERIC_COLS=[];for(var c=0;c<HEADERS.length;c++){var nc=0,t=0;for(var r=0;r<ALL_DATA.length&&r<500;r++){var v=ALL_DATA[r][c];if(v===''||v===null||v===undefined)continue;t++;if(!isNaN(Number(v)))nc++;}if(t>0&&nc/t>0.7)NUMERIC_COLS.push(c);}}
 function collectNumericUniqueVals(){
@@ -589,13 +708,11 @@ function buildColumnFilters(){
   var old=frow.querySelectorAll('.col-filter,.num-dd-wrap');for(var i=0;i<old.length;i++)frow.removeChild(old[i]);
   var sb=document.getElementById('searchBox');
   numDDState={};
-  // Track where Company filter ends up so we can insert Active/Inactive after it
   var companyFilterEl=null;
   for(var c=0;c<colSets.length;c++){
     if(!colSets[c])continue;
     var hdr=String(HEADERS[c]||'').trim().toUpperCase();
     if(colSets[c]==='NUMERIC'){
-      // Custom dropdown for numeric columns
       var wrap=document.createElement('div');
       wrap.className='num-dd-wrap';
       wrap.setAttribute('data-col',c);
@@ -614,7 +731,7 @@ function buildColumnFilters(){
       renderNumDDList(c,'');
     } else {
       var sel=document.createElement('select');sel.className='col-filter';sel.setAttribute('data-col',c);
-      sel.style.cssText='background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
+      sel.style.cssText='background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
       sel.setAttribute('data-type','text');sel.innerHTML='<option value="">'+hdr+'</option>';
       var items=colSets[c];for(var i=0;i<items.length;i++){sel.innerHTML+='<option value="'+items[i].replace(/"/g,'&quot;')+'">'+items[i]+'</option>';}
       sel.onchange=applyAll;frow.insertBefore(sel,sb);
@@ -623,7 +740,7 @@ function buildColumnFilters(){
   }
   // Add Active/Inactive filter after Company filter
   var aiSel=document.createElement('select');aiSel.className='col-filter';aiSel.id='activeInactiveFilter';
-  aiSel.style.cssText='background:#0f1a2e;color:#eee;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
+  aiSel.style.cssText='background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
   aiSel.setAttribute('data-type','special-ai');
   aiSel.innerHTML='<option value="">Active - Inactive</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option>';
   aiSel.onchange=applyAll;
@@ -657,7 +774,7 @@ function renderNumDDList(col,search){
     shown++;
     if(shown>=200)break;
   }
-  if(shown===0)h='<div style="padding:6px 8px;color:#555;font-size:11px">No values found</div>';
+  if(shown===0)h='<div style="padding:6px 8px;color:#666;font-size:11px">No values found</div>';
   container.innerHTML=h;
 }
 function filterNumDDList(col,search){renderNumDDList(col,search);}
@@ -688,7 +805,6 @@ function updateNumBtnLabel(col){
   if(state.exactVal!==null){btn.querySelector('span').textContent=hdr+': '+state.exactVal;btn.classList.add('active-filter');}
   else if(state.sort){btn.querySelector('span').textContent=hdr+' ('+(state.sort==='low-high'?'L-H':'H-L')+')';btn.classList.add('active-filter');}
   else{btn.querySelector('span').textContent=hdr;btn.classList.remove('active-filter');}
-  // Update sort item highlights
   var lh=document.getElementById('numLH_'+col);
   var hl=document.getElementById('numHL_'+col);
   if(lh)lh.className='num-dd-sort-item'+(state.sort==='low-high'?' selected':'');
@@ -716,7 +832,6 @@ function clearFilters(){
 function applyAll(){
   var tf=[];var ns=null;var exactFilters=[];
   var aiFilter='';
-  // Text filters
   var sels=document.querySelectorAll('.col-filter');
   for(var i=0;i<sels.length;i++){
     var v=sels[i].value;if(!v)continue;
@@ -725,7 +840,6 @@ function applyAll(){
     var col=parseInt(sels[i].getAttribute('data-col'));
     tf.push({col:col,val:v.toUpperCase()});
   }
-  // Numeric dropdown filters
   for(var k in numDDState){
     var col=parseInt(k);var state=numDDState[k];
     if(state.sort){ns={col:col,dir:state.sort==='low-high'?1:-1};}
@@ -735,29 +849,22 @@ function applyAll(){
   FILTERED=[];
   for(var i=0;i<ALL_DATA.length;i++){
     var r=ALL_DATA[i];var pass=true;
-    // Text filters
     for(var f=0;f<tf.length;f++){if(String(r[tf[f].col]||'').trim().toUpperCase()!==tf[f].val){pass=false;break;}}
     if(!pass)continue;
-    // Active/Inactive special filter on column N (ACTIVE_COL)
-    // Active = any numeric value 0 or above (0 is Active). Inactive = blank or "INACTIVE" text only
+    // Active/Inactive filter using isActiveValue
     if(aiFilter){
-      var rawVal=r[ACTIVE_COL];
-      var av=(rawVal===0||rawVal==='0')?'0':String(rawVal||'').trim().toUpperCase();
-      var isInactive=(av===''||av==='INACTIVE');
       if(aiFilter==='ACTIVE'){
-        if(isInactive){pass=false;}
+        if(!isActiveValue(r[ACTIVE_COL])){pass=false;}
       } else if(aiFilter==='INACTIVE'){
-        if(!isInactive){pass=false;}
+        if(isActiveValue(r[ACTIVE_COL])){pass=false;}
       }
     }
     if(!pass)continue;
-    // Exact numeric filters
     for(var f=0;f<exactFilters.length;f++){
       var rv=Number(r[exactFilters[f].col]);
       if(isNaN(rv)||rv!==exactFilters[f].val){pass=false;break;}
     }
     if(!pass)continue;
-    // Search
     if(sq){var found=false;for(var j=0;j<r.length;j++){if(String(r[j]||'').toUpperCase().indexOf(sq)>=0){found=true;break;}}if(!found)continue;}
     FILTERED.push(r);
   }
@@ -770,54 +877,11 @@ function renderCharts(){
   var ci=getSalesIndexes();var tdy=0,d3=0,d7=0,d15=0,d30=0;
   var platMap={},stockMap={},actCount=0,inactCount=0;
   for(var i=0;i<FILTERED.length;i++){var r=FILTERED[i];tdy+=Number(r[ci.today])||0;d3+=Number(r[ci.day3])||0;d7+=Number(r[ci.day7])||0;d15+=Number(r[ci.day15])||0;d30+=Number(r[ci.day30])||0;
-    var pl=String(r[1]||'').trim();var st=String(r[STOCK_COL]||'').trim();var ac=String(r[ACTIVE_COL]||'').trim().toUpperCase();
-    if(pl){if(!platMap[pl])platMap[pl]=0;platMap[pl]+=Number(r[ci.day30])||0;}if(!stockMap[st])stockMap[st]=0;stockMap[st]++;if(ac==='INACTIVE')inactCount++;else actCount++;}
+    var pl=String(r[1]||'').trim();var st=String(r[STOCK_COL]||'').trim();
+    if(pl){if(!platMap[pl])platMap[pl]=0;platMap[pl]+=Number(r[ci.day30])||0;}if(!stockMap[st])stockMap[st]=0;stockMap[st]++;
+    if(isActiveValue(r[ACTIVE_COL]))actCount++;else inactCount++;
+  }
   dc('ch1');CHS.ch1=new Chart(document.getElementById('ch1'),{type:'bar',data:{labels:['Today','3 Day','7 Day','15 Day','30 Day'],datasets:[{data:[tdy,d3,d7,d15,d30],backgroundColor:['#39ff14','#4fc3f7','#e09f3e','#a855f7','#dc2f02'],borderRadius:5}]},options:bOpts()});
   var sl=[],sv=[],sc=['#39ff14','#dc2f02','#e09f3e','#4fc3f7','#a855f7'];for(var k in stockMap){sl.push(k||'BLANK');sv.push(stockMap[k]);}
   dc('ch2');CHS.ch2=new Chart(document.getElementById('ch2'),{type:'doughnut',data:{labels:sl,datasets:[{data:sv,backgroundColor:sc.slice(0,sl.length),borderWidth:0}]},options:pOpts()});
-  var platArr=[];for(var k in platMap)platArr.push({n:k,v:platMap[k]});platArr.sort(function(a,b){return b.v-a.v;});
-  var pl2=[],pv=[],pc=['#4fc3f7','#39ff14','#e09f3e','#a855f7','#dc2f02','#f72585','#7209b7','#3a0ca3','#4361ee','#4cc9f0'];
-  for(var i=0;i<platArr.length;i++){pl2.push(platArr[i].n);pv.push(platArr[i].v);}
-  dc('ch3');CHS.ch3=new Chart(document.getElementById('ch3'),{type:'bar',data:{labels:pl2,datasets:[{data:pv,backgroundColor:pc.slice(0,pl2.length),borderRadius:5}]},options:bOpts()});
-  dc('ch4');CHS.ch4=new Chart(document.getElementById('ch4'),{type:'doughnut',data:{labels:['Active','Inactive'],datasets:[{data:[actCount,inactCount],backgroundColor:['#39ff14','#dc2f02'],borderWidth:0}]},options:pOpts()});
-}
-function bOpts(){return{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{color:'#222'}},y:{ticks:{color:'#888',font:{size:10}},grid:{color:'#222'}}}};}
-function pOpts(){return{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#eee',padding:10,font:{size:10}}}}};}
-function dc(id){if(CHS[id]){CHS[id].destroy();CHS[id]=null;}}
-function renderTable(){
-  PER_PAGE=parseInt(document.getElementById('ppSelect').value)||100;
-  var th='';for(var i=0;i<HEADERS.length;i++){var s=i>=SORTABLE_FROM;var arrow='';if(SORT_COL===i)arrow='<span class="arrow">'+(SORT_DIR===1?'\u25B2':'\u25BC')+'</span>';
-    if(s){th+='<th class="sortable" onclick="sortBy('+i+')">'+HEADERS[i]+arrow+'</th>';}else{th+='<th>'+HEADERS[i]+'</th>';}}
-  document.getElementById('thead').innerHTML=th;
-  var start=PAGE*PER_PAGE;var end=Math.min(start+PER_PAGE,FILTERED.length);var tp=Math.ceil(FILTERED.length/PER_PAGE)||1;
-  var tb='';
-  for(var i=start;i<end;i++){var r=FILTERED[i];tb+='<tr>';
-    for(var j=0;j<r.length;j++){var val=r[j];var cc='';var ct='';
-      if(j===STOCK_COL){var su=String(val||'').trim().toUpperCase();ct=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';}
-      else if(j===ACTIVE_COL){var au=String(val||'').trim().toUpperCase();ct=au==='INACTIVE'?'<span class="badge br">INACTIVE</span>':'<span class="badge bg">'+val+'</span>';}
-      else if(isUrl(val)){ct=makeLink(val);}
-      else if(isRedVal(val,j)){cc=' class="zero"';ct=(val===''||val===null||val===undefined)?'0':val;}
-      else{ct=(val===null||val===undefined)?'':val;}
-      tb+='<td'+cc+'>'+ct+'</td>';}tb+='</tr>';}
-  document.getElementById('tbody').innerHTML=tb||'<tr><td colspan="'+HEADERS.length+'" style="text-align:center;color:#888;padding:20px">No data</td></tr>';
-  document.getElementById('ttotal').textContent='Total: '+fmt(FILTERED.length);
-  document.getElementById('tcount').textContent='Showing '+(FILTERED.length>0?start+1:0)+'-'+end+' of '+FILTERED.length;
-  document.getElementById('pageInfo').textContent='Page '+(PAGE+1)+' of '+tp;
-  document.getElementById('prevBtn').disabled=PAGE===0;document.getElementById('nextBtn').disabled=end>=FILTERED.length;
-}
-function isRedVal(val,ci){if(ci>=SORTABLE_FROM){if(val===0||val==='0'||val===''||val===null||val===undefined)return true;}if(RATING_COLS.indexOf(ci)>=0){var n=parseFloat(val);if(!isNaN(n)&&n<3.5&&n>=0)return true;}return false;}
-function isUrl(v){var s=String(v||'').trim();return s.indexOf('http://')===0||s.indexOf('https://')===0||s.indexOf('www.')===0;}
-function makeLink(v){var s=String(v||'').trim();var href=s;if(s.indexOf('www.')===0)href='https://'+s;var d=s.replace(/^https?:\/\//,'').replace(/^www\./,'');if(d.length>30)d=d.substring(0,30)+'...';return'<a href="'+href+'" target="_blank" rel="noopener">'+d+'</a>';}
-function changePage(dir){PAGE+=dir;renderTable();}
-function changePageSize(){PAGE=0;renderTable();}
-function downloadMainCSV(){
-  if(!FILTERED.length){alert('No data!');return;}var csv=[];var hr=[];
-  for(var i=0;i<HEADERS.length;i++)hr.push('"'+String(HEADERS[i]||'').replace(/"/g,'""')+'"');csv.push(hr.join(','));
-  for(var r=0;r<FILTERED.length;r++){var row=[];for(var c=0;c<FILTERED[r].length;c++){row.push('"'+String(FILTERED[r][c]===null||FILTERED[r][c]===undefined?'':FILTERED[r][c]).replace(/"/g,'""')+'"');}csv.push(row.join(','));}
-  var blob=new Blob([csv.join('\n')],{type:'text/csv;charset=utf-8;'});var link=document.createElement('a');link.href=URL.createObjectURL(blob);
-  link.download='SKU_WISE_SALES_'+new Date().toISOString().slice(0,10)+'.csv';link.click();URL.revokeObjectURL(link.href);
-}
-loadData();
-</script>
-</body>
-</html>
+  var platArr=[];for(var k in platMap)platArr.push({n:k,v:platMap[k]});platArr.sort(f
