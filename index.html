@@ -66,8 +66,8 @@ td a:hover{text-decoration:underline;color:#39ff14}
 .srch:focus{border-color:#4fc3f7;outline:none}
 .ft{text-align:center;color:#555;font-size:10px;margin-top:8px}
 .home-btn{background:none;border:none;cursor:pointer;padding:4px;position:absolute;left:0;top:50%;transform:translateY(-50%);display:flex;align-items:center}
-.home-btn svg{width:28px;height:28px;fill:#39ff14;transition:.2s}
-.home-btn:hover svg{fill:#fff}
+.home-btn svg{width:28px;height:28px;fill:none;stroke:#39ff14;transition:.2s}
+.home-btn:hover svg{stroke:#fff}
 @media(max-width:768px){.chs{grid-template-columns:1fr}.cards{grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}.global-search{width:160px;font-size:11px;padding:6px 10px}}
 
 /* CUSTOM NUMERIC DROPDOWN */
@@ -130,7 +130,7 @@ td a:hover{text-decoration:underline;color:#39ff14}
 </head>
 <body>
 <div class="header-row">
-  <button class="home-btn" onclick="clearFilters()" title="Home - Clear All Filters"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
+  <button class="home-btn" onclick="clearFilters()" title="Home - Clear All Filters"><svg viewBox="0 0 24 24" fill="none" stroke="#39ff14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M5 10v9a1 1 0 001 1h3v-5h6v5h3a1 1 0 001-1v-9"/></svg></button>
   <div class="sub" id="info">SKU WISE SALES</div>
   <div class="global-search-wrap">
     <input class="global-search" id="globalSearch" placeholder="Search anything across all SKUs..." oninput="globalSearchHandler()">
@@ -825,8 +825,8 @@ function buildColumnFilters(){
         numHtml+='<div class="num-dd-sort" style="border-top:1px solid #333;padding-top:4px">'
           +'<div class="num-dd-sort-item" style="color:#39ff14" onclick="setNumRange('+c+',\'above\',4.5)">Above 4.5</div>'
           +'<div class="num-dd-sort-item" style="color:#39ff14" onclick="setNumRange('+c+',\'above\',4)">Above 4.0</div>'
-          +'<div class="num-dd-sort-item" style="color:#39ff14" onclick="setNumRange('+c+',\'above\',3.5)">Above 3.5</div>'
-          +'<div class="num-dd-sort-item" style="color:#39ff14" onclick="setNumRange('+c+',\'above\',3)">Above 3.0</div>'
+          +'<div class="num-dd-sort-item" style="color:#e09f3e" onclick="setNumRange('+c+',\'above\',3.5)">Above 3.5</div>'
+          +'<div class="num-dd-sort-item" style="color:#e09f3e" onclick="setNumRange('+c+',\'above\',3)">Above 3.0</div>'
           +'<div class="num-dd-sort-item" style="color:#ff4444" onclick="setNumRange('+c+',\'below\',4.5)">Below 4.5</div>'
           +'<div class="num-dd-sort-item" style="color:#ff4444" onclick="setNumRange('+c+',\'below\',4)">Below 4.0</div>'
           +'<div class="num-dd-sort-item" style="color:#ff4444" onclick="setNumRange('+c+',\'below\',3.5)">Below 3.5</div>'
@@ -1152,19 +1152,19 @@ function loadMoreMainRows(){
     document.querySelector('.pag').innerHTML='<div style="color:#4fc3f7;font-size:12px">Loaded '+fmt(LOADED)+' of '+fmt(FILTERED.length)+' • Scroll to load more...</div>';
   }
 }
-function detectStockInPlatCol(){STOCK_IN_PLAT_COL=-1;for(var i=0;i<HEADERS.length;i++){var h=String(HEADERS[i]||'').toUpperCase();if(h.indexOf('STOCK IN PLAT')>=0||h==='STOCK IN PLATFORM'){STOCK_IN_PLAT_COL=i;break;}}}
+function detectStockInPlatCol(){STOCK_IN_PLAT_COL=-1;for(var i=0;i<HEADERS.length;i++){var h=String(HEADERS[i]||'').trim().toUpperCase();if(h.indexOf('STOCK IN PLAT')>=0||h.indexOf('STOCK_IN_PLAT')>=0||h==='STOCK IN PLATFORM'){STOCK_IN_PLAT_COL=i;break;}}console.log('STOCK_IN_PLAT_COL detected:',STOCK_IN_PLAT_COL,STOCK_IN_PLAT_COL>=0?HEADERS[STOCK_IN_PLAT_COL]:'NOT FOUND');}
 function formatCellValue(val,j){
   var cc='',ct='';
   if(j===STOCK_COL){var su=String(val||'').trim().toUpperCase();ct=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';}
   else if(j===ACTIVE_COL){ct=isActiveValue(val)?'<span class="badge bg">'+val+'</span>':'<span class="badge br">'+(val===''||val===null||val===undefined?'BLANK':val)+'</span>';}
-  else if(j===STOCK_IN_PLAT_COL&&STOCK_IN_PLAT_COL>=0){var n=Number(val);if(val===0||val==='0'||n===0){cc=' style="color:#ff4444;font-weight:700"';ct='0';}else if(!isNaN(n)&&n>0){cc=' style="color:#39ff14;font-weight:700"';ct=val;}else{ct=(val===null||val===undefined)?'':val;}}
-  else if(RATING_COLS.indexOf(j)>=0){var n=parseFloat(val);if(!isNaN(n)&&n>0){if(n>=3){cc=' style="color:#39ff14;font-weight:700"';}else{cc=' style="color:#ff4444;font-weight:700"';}ct=val;}else{ct=(val===null||val===undefined)?'':val;}}
+  else if(j===STOCK_IN_PLAT_COL&&STOCK_IN_PLAT_COL>=0){var sv=String(val===null||val===undefined?'':val).trim();var n=parseFloat(sv);if(sv===''||sv==='0'||sv==='0.0'||(!isNaN(n)&&n===0)){cc=' style="color:#ff4444;font-weight:700"';ct=sv===''?'0':sv;}else if(!isNaN(n)&&n>0){cc=' style="color:#39ff14;font-weight:700"';ct=sv;}else{ct=sv;}}
+  else if(RATING_COLS.indexOf(j)>=0){var n=parseFloat(val);if(!isNaN(n)&&n>0){if(n>=4){cc=' style="color:#39ff14;font-weight:700"';}else if(n>=3){cc=' style="color:#e09f3e;font-weight:700"';}else{cc=' style="color:#ff4444;font-weight:700"';}ct=val;}else{ct=(val===null||val===undefined)?'':val;}}
   else if(isUrl(val)){ct=makeLink(val);}
   else if(isRedVal(val,j)){cc=' class="zero"';ct=(val===''||val===null||val===undefined)?'0':val;}
   else{ct=(val===null||val===undefined)?'':val;}
   return '<td'+cc+'>'+ct+'</td>';
 }
-function isRedVal(val,ci){if(ci>=SORTABLE_FROM){if(val===0||val==='0'||val===''||val===null||val===undefined)return true;}if(RATING_COLS.indexOf(ci)>=0){var n=parseFloat(val);if(!isNaN(n)&&n<3.5&&n>=0)return true;}return false;}
+function isRedVal(val,ci){if(ci>=SORTABLE_FROM){if(val===0||val==='0'||val===''||val===null||val===undefined)return true;}if(RATING_COLS.indexOf(ci)>=0){var n=parseFloat(val);if(!isNaN(n)&&n<3&&n>=0)return true;}return false;}
 function isUrl(v){var s=String(v||'').trim();return s.indexOf('http://')===0||s.indexOf('https://')===0||s.indexOf('www.')===0;}
 function makeLink(v){var s=String(v||'').trim();var href=s;if(s.indexOf('www.')===0)href='https://'+s;var d=s.replace(/^https?:\/\//,'').replace(/^www\./,'');if(d.length>30)d=d.substring(0,30)+'...';return'<a href="'+href+'" target="_blank" rel="noopener">'+d+'</a>';}
 function downloadMainCSV(){
