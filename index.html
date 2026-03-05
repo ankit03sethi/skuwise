@@ -324,7 +324,7 @@ function filterByType(type,dataset){
       case 'day30':if((Number(r[ci.day30])||0)>0)result.push(r);break;
       case 'day60':if((Number(r[ci.day60])||0)>0)result.push(r);break;
       case 'needopen':
-        if(STOCK_IN_PLAT_COL>=0){var sipVal=parseFloat(r[STOCK_IN_PLAT_COL]);if(stock==='IN STOCK'&&(isNaN(sipVal)||sipVal===0))result.push(r);}
+        if(STOCK_IN_PLAT_COL>=0){var sv0=String(r[STOCK_IN_PLAT_COL]===null||r[STOCK_IN_PLAT_COL]===undefined?'':r[STOCK_IN_PLAT_COL]).trim();var sipVal=parseFloat(sv0);if(stock==='IN STOCK'&&sv0!==''&&!isNaN(sipVal)&&sipVal===0)result.push(r);}
         else{if(stock==='IN STOCK'&&!isActiveValue(r[ACTIVE_COL]))result.push(r);}break;
       case 'needclose':
         if(STOCK_IN_PLAT_COL>=0){var sipVal2=parseFloat(r[STOCK_IN_PLAT_COL]);if(stock!=='IN STOCK'&&stock!==''&&!isNaN(sipVal2)&&sipVal2>0)result.push(r);}
@@ -1158,7 +1158,7 @@ function detectStockInPlatCol(){STOCK_IN_PLAT_COL=-1;for(var i=0;i<HEADERS.lengt
 function formatCellValue(val,j){
   var cc='',ct='';
   if(j===STOCK_COL){var su=String(val||'').trim().toUpperCase();ct=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';}
-  else if(STOCK_IN_PLAT_COL>=0&&j===STOCK_IN_PLAT_COL){var sv=String(val===null||val===undefined?'':val).trim();var n=parseFloat(sv);if(sv===''||sv==='0'||sv==='0.0'||(!isNaN(n)&&n===0)){cc=' style="color:#ff4444;font-weight:700"';ct=sv===''?'0':sv;}else if(!isNaN(n)&&n>0){cc=' style="color:#39ff14;font-weight:700"';ct=sv;}else{ct=sv;}}
+  else if(STOCK_IN_PLAT_COL>=0&&j===STOCK_IN_PLAT_COL){var sv=String(val===null||val===undefined?'':val).trim();var n=parseFloat(sv);if(!isNaN(n)&&n>0){cc=' style="color:#39ff14;font-weight:700"';ct=sv;}else{cc=' style="color:#ff4444;font-weight:700"';ct=sv===''?'0':sv;}}
   else if(j===ACTIVE_COL&&(STOCK_IN_PLAT_COL<0||j!==STOCK_IN_PLAT_COL)){ct=isActiveValue(val)?'<span class="badge bg">'+val+'</span>':'<span class="badge br">'+(val===''||val===null||val===undefined?'BLANK':val)+'</span>';}
   else if(RATING_COLS.indexOf(j)>=0){var n=parseFloat(val);if(!isNaN(n)&&n>0){if(n>=4){cc=' style="color:#39ff14;font-weight:700"';}else if(n>=3){cc=' style="color:#e09f3e;font-weight:700"';}else{cc=' style="color:#ff4444;font-weight:700"';}ct=val;}else{ct=(val===null||val===undefined)?'':val;}}
   else if(isUrl(val)){ct=makeLink(val);}
