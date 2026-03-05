@@ -65,6 +65,9 @@ td a:hover{text-decoration:underline;color:#39ff14}
 .srch{background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:6px;padding:6px 10px;font-size:12px;width:200px}
 .srch:focus{border-color:#4fc3f7;outline:none}
 .ft{text-align:center;color:#555;font-size:10px;margin-top:8px}
+.home-btn{background:none;border:none;cursor:pointer;padding:4px;position:absolute;left:0;top:50%;transform:translateY(-50%);display:flex;align-items:center}
+.home-btn svg{width:28px;height:28px;fill:#39ff14;transition:.2s}
+.home-btn:hover svg{fill:#fff}
 @media(max-width:768px){.chs{grid-template-columns:1fr}.cards{grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}.global-search{width:160px;font-size:11px;padding:6px 10px}}
 
 /* CUSTOM NUMERIC DROPDOWN */
@@ -127,6 +130,7 @@ td a:hover{text-decoration:underline;color:#39ff14}
 </head>
 <body>
 <div class="header-row">
+  <button class="home-btn" onclick="clearFilters()" title="Home - Clear All Filters"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
   <div class="sub" id="info">SKU WISE SALES</div>
   <div class="global-search-wrap">
     <input class="global-search" id="globalSearch" placeholder="Search anything across all SKUs..." oninput="globalSearchHandler()">
@@ -218,6 +222,7 @@ var CHS={};
 var RATING_COLS=[];
 var NUMERIC_COLS=[];
 var NUMERIC_UNIQUE_VALS={};
+var STOCK_IN_PLAT_COL=-1;
 
 // Infinite scroll state
 var LOADED=0,BATCH_SIZE=100;
@@ -271,7 +276,7 @@ function onDataLoaded(d){
   var rawRows=d.rows||[];var cleanRows=[];
   for(var i=0;i<rawRows.length;i++){if(rawRows[i][0]&&String(rawRows[i][0]).trim()!=='')cleanRows.push(rawRows[i]);}
   ALL_DATA=cleanRows;HEADERS=d.headers||[];
-  detectRatingCols();detectNumericCols();collectNumericUniqueVals();
+  detectRatingCols();detectNumericCols();collectNumericUniqueVals();detectStockInPlatCol();
   document.getElementById('loader').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('lastUp').textContent='Updated: '+new Date().toLocaleString();
@@ -639,15 +644,7 @@ function loadMoreModalRows(){
   var h='';
   for(var i=start;i<end;i++){
     var r=M.skuFiltered[i];h+='<tr>';
-    for(var j=0;j<r.length;j++){
-      var val=r[j];var cc='';var ct='';
-      if(j===STOCK_COL){var su=String(val||'').trim().toUpperCase();ct=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';}
-      else if(j===ACTIVE_COL){ct=isActiveValue(val)?'<span class="badge bg">'+val+'</span>':'<span class="badge br">'+(val===''||val===null||val===undefined?'BLANK':val)+'</span>';}
-      else if(isUrl(val)){ct=makeLink(val);}
-      else if(j>=SORTABLE_FROM&&(val===0||val==='0'||val===''||val===null||val===undefined)){cc=' class="zero"';ct=(val===''||val===null||val===undefined)?'0':val;}
-      else{ct=(val===null||val===undefined)?'':val;}
-      h+='<td'+cc+'>'+ct+'</td>';
-    }
+    for(var j=0;j<r.length;j++){h+=formatCellValue(r[j],j);}
     h+='</tr>';
   }
   var tbody=document.getElementById('modalTableBody');
@@ -745,15 +742,7 @@ function loadMoreGlobalRows(){
   var h='';
   for(var i=start;i<end;i++){
     var r=data[i];h+='<tr>';
-    for(var j=0;j<r.length;j++){
-      var val=r[j];var cc='';var ct='';
-      if(j===STOCK_COL){var su=String(val||'').trim().toUpperCase();ct=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';}
-      else if(j===ACTIVE_COL){ct=isActiveValue(val)?'<span class="badge bg">'+val+'</span>':'<span class="badge br">'+(val===''||val===null||val===undefined?'BLANK':val)+'</span>';}
-      else if(isUrl(val)){ct=makeLink(val);}
-      else if(j>=SORTABLE_FROM&&(val===0||val==='0'||val===''||val===null||val===undefined)){cc=' class="zero"';ct=(val===''||val===null||val===undefined)?'0':val;}
-      else{ct=(val===null||val===undefined)?'':val;}
-      h+='<td'+cc+'>'+ct+'</td>';
-    }
+    for(var j=0;j<r.length;j++){h+=formatCellValue(r[j],j);}
     h+='</tr>';
   }
   var tbody=document.getElementById('gResTableBody');
@@ -834,14 +823,14 @@ function buildColumnFilters(){
         +'</div>';
       if(RATING_COLS.indexOf(c)>=0){
         numHtml+='<div class="num-dd-sort" style="border-top:1px solid #333;padding-top:4px">'
-          +'<div class="num-dd-sort-item" onclick="setNumRange('+c+',\'above\',4.5)">Above 4.5</div>'
-          +'<div class="num-dd-sort-item" onclick="setNumRange('+c+',\'above\',4)">Above 4.0</div>'
-          +'<div class="num-dd-sort-item" onclick="setNumRange('+c+',\'above\',3.5)">Above 3.5</div>'
-          +'<div class="num-dd-sort-item" onclick="setNumRange('+c+',\'above\',3)">Above 3.0</div>'
-          +'<div class="num-dd-sort-item" onclick="setNumRange('+c+',\'below\',4.5)">Below 4.5</div>'
-          +'<div class="num-dd-sort-item" onclick="setNumRange('+c+',\'below\',4)">Below 4.0</div>'
-          +'<div class="num-dd-sort-item" onclick="setNumRange('+c+',\'below\',3.5)">Below 3.5</div>'
-          +'<div class="num-dd-sort-item" onclick="setNumRange('+c+',\'below\',3)">Below 3.0</div>'
+          +'<div class="num-dd-sort-item" style="color:#39ff14" onclick="setNumRange('+c+',\'above\',4.5)">Above 4.5</div>'
+          +'<div class="num-dd-sort-item" style="color:#39ff14" onclick="setNumRange('+c+',\'above\',4)">Above 4.0</div>'
+          +'<div class="num-dd-sort-item" style="color:#39ff14" onclick="setNumRange('+c+',\'above\',3.5)">Above 3.5</div>'
+          +'<div class="num-dd-sort-item" style="color:#39ff14" onclick="setNumRange('+c+',\'above\',3)">Above 3.0</div>'
+          +'<div class="num-dd-sort-item" style="color:#ff4444" onclick="setNumRange('+c+',\'below\',4.5)">Below 4.5</div>'
+          +'<div class="num-dd-sort-item" style="color:#ff4444" onclick="setNumRange('+c+',\'below\',4)">Below 4.0</div>'
+          +'<div class="num-dd-sort-item" style="color:#ff4444" onclick="setNumRange('+c+',\'below\',3.5)">Below 3.5</div>'
+          +'<div class="num-dd-sort-item" style="color:#ff4444" onclick="setNumRange('+c+',\'below\',3)">Below 3.0</div>'
           +'</div>';
       }
       numHtml+='<div class="num-dd-vals" id="numVals_'+c+'"></div>'
@@ -1151,13 +1140,7 @@ function loadMoreMainRows(){
   var start=LOADED;var end=Math.min(LOADED+BATCH_SIZE,FILTERED.length);
   var tb='';
   for(var i=start;i<end;i++){var r=FILTERED[i];tb+='<tr>';
-    for(var j=0;j<r.length;j++){var val=r[j];var cc='';var ct='';
-      if(j===STOCK_COL){var su=String(val||'').trim().toUpperCase();ct=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';}
-      else if(j===ACTIVE_COL){ct=isActiveValue(val)?'<span class="badge bg">'+val+'</span>':'<span class="badge br">'+(val===''||val===null||val===undefined?'BLANK':val)+'</span>';}
-      else if(isUrl(val)){ct=makeLink(val);}
-      else if(isRedVal(val,j)){cc=' class="zero"';ct=(val===''||val===null||val===undefined)?'0':val;}
-      else{ct=(val===null||val===undefined)?'':val;}
-      tb+='<td'+cc+'>'+ct+'</td>';}tb+='</tr>';}
+    for(var j=0;j<r.length;j++){tb+=formatCellValue(r[j],j);}tb+='</tr>';}
   var tbody=document.getElementById('tbody');
   if(start===0)tbody.innerHTML=tb;else tbody.innerHTML+=tb;
   LOADED=end;
@@ -1168,6 +1151,18 @@ function loadMoreMainRows(){
   } else {
     document.querySelector('.pag').innerHTML='<div style="color:#4fc3f7;font-size:12px">Loaded '+fmt(LOADED)+' of '+fmt(FILTERED.length)+' • Scroll to load more...</div>';
   }
+}
+function detectStockInPlatCol(){STOCK_IN_PLAT_COL=-1;for(var i=0;i<HEADERS.length;i++){var h=String(HEADERS[i]||'').toUpperCase();if(h.indexOf('STOCK IN PLAT')>=0||h==='STOCK IN PLATFORM'){STOCK_IN_PLAT_COL=i;break;}}}
+function formatCellValue(val,j){
+  var cc='',ct='';
+  if(j===STOCK_COL){var su=String(val||'').trim().toUpperCase();ct=su==='IN STOCK'?'<span class="badge bg">IN STOCK</span>':'<span class="badge br">'+val+'</span>';}
+  else if(j===ACTIVE_COL){ct=isActiveValue(val)?'<span class="badge bg">'+val+'</span>':'<span class="badge br">'+(val===''||val===null||val===undefined?'BLANK':val)+'</span>';}
+  else if(j===STOCK_IN_PLAT_COL&&STOCK_IN_PLAT_COL>=0){var n=Number(val);if(val===0||val==='0'||n===0){cc=' style="color:#ff4444;font-weight:700"';ct='0';}else if(!isNaN(n)&&n>0){cc=' style="color:#39ff14;font-weight:700"';ct=val;}else{ct=(val===null||val===undefined)?'':val;}}
+  else if(RATING_COLS.indexOf(j)>=0){var n=parseFloat(val);if(!isNaN(n)&&n>0){if(n>=3){cc=' style="color:#39ff14;font-weight:700"';}else{cc=' style="color:#ff4444;font-weight:700"';}ct=val;}else{ct=(val===null||val===undefined)?'':val;}}
+  else if(isUrl(val)){ct=makeLink(val);}
+  else if(isRedVal(val,j)){cc=' class="zero"';ct=(val===''||val===null||val===undefined)?'0':val;}
+  else{ct=(val===null||val===undefined)?'':val;}
+  return '<td'+cc+'>'+ct+'</td>';
 }
 function isRedVal(val,ci){if(ci>=SORTABLE_FROM){if(val===0||val==='0'||val===''||val===null||val===undefined)return true;}if(RATING_COLS.indexOf(ci)>=0){var n=parseFloat(val);if(!isNaN(n)&&n<3.5&&n>=0)return true;}return false;}
 function isUrl(v){var s=String(v||'').trim();return s.indexOf('http://')===0||s.indexOf('https://')===0||s.indexOf('www.')===0;}
