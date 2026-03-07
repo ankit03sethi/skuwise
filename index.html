@@ -10,8 +10,11 @@
 body{font-family:'Segoe UI',sans-serif;background:#1a1a2e;color:#eee;padding:12px;min-height:100vh;overflow-x:hidden}
 .header-row{display:flex;justify-content:center;align-items:center;position:relative;margin-bottom:4px}
 h1{text-align:center;color:#39ff14;font-size:20px;letter-spacing:1px}
-.global-search-wrap{position:absolute;right:0;top:50%;transform:translateY(-50%)}
-.global-search{background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:8px;padding:8px 14px;font-size:13px;width:280px;transition:border-color .2s}
+.global-search-wrap{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center}
+.search-icon{background:none;border:none;color:#eee;font-size:20px;cursor:pointer;padding:6px;transition:color .2s}
+.search-icon:hover{color:#39ff14}
+.global-search{background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:8px;padding:8px 14px;font-size:13px;width:0;opacity:0;transition:width .3s ease,opacity .3s ease,border-color .2s,padding .3s ease;overflow:hidden;padding:0}
+.global-search.open{width:220px;opacity:1;padding:8px 14px;border-color:#39ff14}
 .global-search:focus{border-color:#39ff14;outline:none;box-shadow:0 0 8px rgba(57,255,20,.3)}
 .global-search::placeholder{color:#666}
 .sub{text-align:center;color:#39ff14;font-size:20px;margin-bottom:12px;letter-spacing:1px;font-weight:700}
@@ -68,7 +71,7 @@ td a:hover{text-decoration:underline;color:#39ff14}
 .home-btn{background:none;border:none;cursor:pointer;padding:4px;position:absolute;left:0;top:50%;transform:translateY(-50%);display:flex;align-items:center}
 .home-btn svg{width:28px;height:28px;fill:none;stroke:#39ff14;transition:.2s}
 .home-btn:hover svg{stroke:#fff}
-@media(max-width:768px){.chs{grid-template-columns:1fr}.cards{grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}.global-search{width:160px;font-size:11px;padding:6px 10px}}
+@media(max-width:768px){.chs{grid-template-columns:1fr}.cards{grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}.global-search.open{width:160px;font-size:11px;padding:6px 10px}}
 
 /* CUSTOM NUMERIC DROPDOWN */
 .num-dd-wrap{position:relative;display:inline-block}
@@ -133,7 +136,8 @@ td a:hover{text-decoration:underline;color:#39ff14}
   <button class="home-btn" onclick="clearFilters()" title="Home - Clear All Filters"><svg viewBox="0 0 24 24" fill="none" stroke="#39ff14" stroke-width="1.5"><path d="M4 12L12 4l8 8"/><path d="M6 10.5V19.5a.5.5 0 00.5.5H10v-5h4v5h3.5a.5.5 0 00.5-.5V10.5"/></svg></button>
   <div class="sub" id="info">SKU WISE SALES</div>
   <div class="global-search-wrap">
-    <input class="global-search" id="globalSearch" placeholder="Search anything across all SKUs..." oninput="globalSearchHandler()">
+    <input class="global-search" id="globalSearch" placeholder="Search SKUs..." oninput="globalSearchHandler()">
+    <button class="search-icon" onclick="toggleSearch()" title="Search">&#128269;</button>
   </div>
 </div>
 <div id="loader" class="loading"><div class="spin"></div><br>Loading dashboard data...<br><span style="font-size:13px;color:#888">This may take 15-20 seconds</span></div>
@@ -702,6 +706,11 @@ function downloadModalCSV(){
 }
 
 // ===== GLOBAL SEARCH (TOP RIGHT) =====
+function toggleSearch(){
+  var inp=document.getElementById('globalSearch');
+  inp.classList.toggle('open');
+  if(inp.classList.contains('open')){inp.focus();}else{inp.value='';closeGlobalSearch();}
+}
 function globalSearchHandler(){
   clearTimeout(G_TIMER);
   var val=document.getElementById('globalSearch').value.trim();
@@ -896,7 +905,7 @@ function buildColumnFilters(){
   var aiSel=document.createElement('select');aiSel.className='col-filter';aiSel.id='activeInactiveFilter';
   aiSel.style.cssText='background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
   aiSel.setAttribute('data-type','special-ai');
-  aiSel.innerHTML='<option value="">Active - Inactive</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option>';
+  aiSel.innerHTML='<option value="">ACTIVE - INACTIVE</option><option value="ACTIVE">ACTIVE</option><option value="INACTIVE">INACTIVE</option>';
   aiSel.onchange=applyAll;
   if(companyFilterEl&&companyFilterEl.nextSibling){frow.insertBefore(aiSel,companyFilterEl.nextSibling);}
   else{frow.insertBefore(aiSel,sb);}
