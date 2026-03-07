@@ -155,6 +155,10 @@ td a:hover{text-decoration:underline;color:#39ff14}
 <div class="section-title">ACTION REQUIRED</div>
 <div class="cards" id="actionCards"></div>
 
+<!-- CARDS ROW 4: TREND -->
+<div class="section-title">SALES TREND</div>
+<div class="cards" id="trendCards"></div>
+
 <!-- FILTERS -->
 <div class="fbox">
 <h3>Filters</h3>
@@ -306,6 +310,30 @@ function getSalesIndexes(){
   return ci;
 }
 
+// ===== TREND CALCULATION =====
+var TREND_THRESHOLD=0.20; // 20% tolerance for "stable"
+function getTrend(row){
+  var ci=getSalesIndexes();
+  var s7=Number(row[ci.day7])||0;
+  var s30=Number(row[ci.day30])||0;
+  var s60=Number(row[ci.day60])||0;
+  if(s7===0&&s30===0&&s60===0)return 'nosale';
+  var avg7=s7/7;var avg30=s30/30;var avg60=s60/60;
+  // Uptrend: 7-day avg > 30-day avg > 60-day avg
+  if(avg7>avg30*(1+TREND_THRESHOLD)&&avg30>avg60*(1+TREND_THRESHOLD))return 'uptrend';
+  // Downtrend: 7-day avg < 30-day avg < 60-day avg
+  if(avg7<avg30*(1-TREND_THRESHOLD)&&avg30<avg60*(1-TREND_THRESHOLD))return 'downtrend';
+  return 'stable';
+}
+function getTrendBgColor(trend){
+  switch(trend){
+    case 'uptrend':return 'rgba(57,255,20,0.08)';
+    case 'downtrend':return 'rgba(220,47,2,0.08)';
+    case 'stable':return 'rgba(224,159,62,0.08)';
+    default:return '';
+  }
+}
+
 // ===== CARD FILTER LOGIC =====
 function filterByType(type,dataset){
   var src=dataset||ALL_DATA;
@@ -335,6 +363,10 @@ function filterByType(type,dataset){
         else{if(stock!=='IN STOCK'&&stock!==''&&isActiveValue(r[ACTIVE_COL])&&activeNum>0)result.push(r);}break;
       case 'inactiveInStock':
         if(!isActiveValue(r[ACTIVE_COL])&&stock==='IN STOCK')result.push(r);break;
+      case 'uptrend':if(getTrend(r)==='uptrend')result.push(r);break;
+      case 'downtrend':if(getTrend(r)==='downtrend')result.push(r);break;
+      case 'stable':if(getTrend(r)==='stable')result.push(r);break;
+      case 'nosale':if(getTrend(r)==='nosale')result.push(r);break;
     }
   }
   return result;
@@ -375,6 +407,13 @@ function renderCards(){
   ah+=mkcard('Need To Close',fmt(ntcData.length),'r','needclose');
   ah+=mkcard('Need To Activate',fmt(iisData.length),'o','inactiveInStock');
   document.getElementById('actionCards').innerHTML=ah;
+
+  var th='';
+  th+=mkcard('Trending Up',fmt(filterByType('uptrend',data).length),'g','uptrend');
+  th+=mkcard('Trending Down',fmt(filterByType('downtrend',data).length),'r','downtrend');
+  th+=mkcard('Stable',fmt(filterByType('stable',data).length),'o','stable');
+  th+=mkcard('No Sales',fmt(filterByType('nosale',data).length),'b','nosale');
+  document.getElementById('trendCards').innerHTML=th;
 }
 function mkcard(label,value,cc,type){
   return '<div class="cd '+cc+'" onclick="openDrill(\''+type+'\',\''+label.replace(/'/g,"\\'")+'\')"><div class="lb">'+label+'</div><div class="vl">'+value+'</div></div>';
@@ -909,6 +948,15 @@ function buildColumnFilters(){
   aiSel.onchange=applyAll;
   if(companyFilterEl&&companyFilterEl.nextSibling){frow.insertBefore(aiSel,companyFilterEl.nextSibling);}
   else{frow.insertBefore(aiSel,sb);}
+
+  // Add Trend filter after Active/Inactive filter
+  var trendSel=document.createElement('select');trendSel.className='col-filter';trendSel.id='trendFilter';
+  trendSel.style.cssText='background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
+  trendSel.setAttribute('data-type','special-trend');
+  trendSel.innerHTML='<option value="">TREND</option><option value="UPTREND">UPTREND</option><option value="DOWNTREND">DOWNTREND</option><option value="STABLE">STABLE</option><option value="NOSALE">NO SALES</option>';
+  trendSel.onchange=applyAll;
+  if(aiSel.nextSibling){frow.insertBefore(trendSel,aiSel.nextSibling);}
+  else{frow.insertBefore(trendSel,sb);}
 }
 
 // ===== TEXT DROPDOWN LOGIC (for >200 unique values) =====
@@ -1053,6 +1101,7 @@ document.addEventListener('click',function(e){
 function clearFilters(){
   var sels=document.querySelectorAll('.col-filter');for(var i=0;i<sels.length;i++)sels[i].value='';
   var aiF=document.getElementById('activeInactiveFilter');if(aiF)aiF.value='';
+  var tF=document.getElementById('trendFilter');if(tF)tF.value='';
   document.getElementById('searchBox').value='';
   document.getElementById('globalSearch').value='';
   for(var k in numDDState){
@@ -1071,12 +1120,13 @@ function clearFilters(){
 }
 function applyAll(){
   var tf=[];var ns=null;var exactFilters=[];var textFilters=[];var rangeFilters=[];
-  var aiFilter='';
+  var aiFilter='';var trendFilter='';
   var sels=document.querySelectorAll('.col-filter');
   for(var i=0;i<sels.length;i++){
     var v=sels[i].value;if(!v)continue;
     var dtype=sels[i].getAttribute('data-type');
     if(dtype==='special-ai'){aiFilter=v;continue;}
+    if(dtype==='special-trend'){trendFilter=v;continue;}
     var col=parseInt(sels[i].getAttribute('data-col'));
     tf.push({col:col,val:v.toUpperCase()});
   }
@@ -1103,6 +1153,15 @@ function applyAll(){
       } else if(aiFilter==='INACTIVE'){
         if(isActiveValue(r[ACTIVE_COL])){pass=false;}
       }
+    }
+    if(!pass)continue;
+    // Trend filter
+    if(trendFilter){
+      var t=getTrend(r);
+      if(trendFilter==='UPTREND'&&t!=='uptrend'){pass=false;}
+      else if(trendFilter==='DOWNTREND'&&t!=='downtrend'){pass=false;}
+      else if(trendFilter==='STABLE'&&t!=='stable'){pass=false;}
+      else if(trendFilter==='NOSALE'&&t!=='nosale'){pass=false;}
     }
     if(!pass)continue;
     for(var f=0;f<exactFilters.length;f++){
@@ -1174,7 +1233,8 @@ function renderTable(){
 function loadMoreMainRows(){
   var start=LOADED;var end=Math.min(LOADED+BATCH_SIZE,FILTERED.length);
   var tb='';
-  for(var i=start;i<end;i++){var r=FILTERED[i];tb+='<tr>';
+  for(var i=start;i<end;i++){var r=FILTERED[i];var tBg=getTrendBgColor(getTrend(r));
+    tb+='<tr'+(tBg?' style="background:'+tBg+'"':'')+'>';
     for(var j=0;j<r.length;j++){tb+=formatCellValue(r[j],j);}tb+='</tr>';}
   var tbody=document.getElementById('tbody');
   if(start===0)tbody.innerHTML=tb;else tbody.innerHTML+=tb;
