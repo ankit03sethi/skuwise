@@ -316,7 +316,7 @@ function filterByType(type,dataset){
       case 'active':if(isActiveValue(r[ACTIVE_COL]))result.push(r);break;
       case 'inactive':if(!isActiveValue(r[ACTIVE_COL]))result.push(r);break;
       case 'instock':if(stock==='IN STOCK')result.push(r);break;
-      case 'outofstock':if(stock!=='IN STOCK'&&stock!=='')result.push(r);break;
+      case 'outofstock':if(stock==='OUT OF STOCK')result.push(r);break;
       case 'today':if((Number(r[ci.today])||0)>0)result.push(r);break;
       case 'day3':if((Number(r[ci.day3])||0)>0)result.push(r);break;
       case 'day7':if((Number(r[ci.day7])||0)>0)result.push(r);break;
@@ -358,7 +358,6 @@ function renderCards(){
   sth+=mkcard('Total SKUs',fmt(data.length),'b','total');
   sth+=mkcard('Active',fmt(filterByType('active',data).length),'g','active');
   sth+=mkcard('Inactive',fmt(filterByType('inactive',data).length),'r','inactive');
-  sth+=mkcard('In Stock',fmt(filterByType('instock',data).length),'g','instock');
   sth+=mkcard('Out of Stock',fmt(filterByType('outofstock',data).length),'r','outofstock');
   document.getElementById('statusCards').innerHTML=sth;
 
