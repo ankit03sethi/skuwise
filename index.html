@@ -52,7 +52,7 @@ th.sortable{cursor:pointer}
 th.sortable:hover{background:#1a4a80;color:#39ff14}
 th .arrow{margin-left:4px;font-size:10px;color:#39ff14}
 td{padding:5px 8px;border-bottom:1px solid #1a1a2e;color:#ddd;text-align:center}
-tr:nth-child(even) td{background:#0a0f1e}
+tr:nth-child(even) td{background:#0a0f1e}tr.trend-row td{background:transparent!important}
 tr:hover td{background:#1f2b47}
 .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.3px}
 .bg{background:#143d14;color:#39ff14;border:1px solid #2a6b2a}
@@ -316,6 +316,7 @@ function getTrend(row){
   var ci=getSalesIndexes();
   var s7=Number(row[ci.day7])||0;
   var s60=Number(row[ci.day60])||0;
+  if(s60<30)return 'nosale';
   if(s7===0&&s60===0)return 'nosale';
   var avg7=s7/7;var avg60=s60/60;
   if(avg60===0&&avg7>0)return 'uptrend';
@@ -713,7 +714,7 @@ function loadMoreModalRows(){
   var h='';
   for(var i=start;i<end;i++){
     var r=M.skuFiltered[i];var mBg=getTrendBgColor(getTrend(r));
-    h+='<tr'+(mBg?' style="background:'+mBg+'"':'')+'>';
+    h+='<tr'+(mBg?' class="trend-row" style="background:'+mBg+'"':'')+'>';
     for(var j=0;j<r.length;j++){h+=formatCellValue(r[j],j);}
     h+='</tr>';
   }
@@ -817,7 +818,7 @@ function loadMoreGlobalRows(){
   var h='';
   for(var i=start;i<end;i++){
     var r=data[i];var gBg=getTrendBgColor(getTrend(r));
-    h+='<tr'+(gBg?' style="background:'+gBg+'"':'')+'>';
+    h+='<tr'+(gBg?' class="trend-row" style="background:'+gBg+'"':'')+'>';
     for(var j=0;j<r.length;j++){h+=formatCellValue(r[j],j);}
     h+='</tr>';
   }
@@ -1236,7 +1237,7 @@ function loadMoreMainRows(){
   var start=LOADED;var end=Math.min(LOADED+BATCH_SIZE,FILTERED.length);
   var tb='';
   for(var i=start;i<end;i++){var r=FILTERED[i];var tBg=getTrendBgColor(getTrend(r));
-    tb+='<tr'+(tBg?' style="background:'+tBg+'"':'')+'>';
+    tb+='<tr'+(tBg?' class="trend-row" style="background:'+tBg+'"':'')+'>';
     for(var j=0;j<r.length;j++){tb+=formatCellValue(r[j],j);}tb+='</tr>';}
   var tbody=document.getElementById('tbody');
   if(start===0)tbody.innerHTML=tb;else tbody.innerHTML+=tb;
