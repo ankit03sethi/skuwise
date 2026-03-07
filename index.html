@@ -370,7 +370,7 @@ function renderCards(){
 
   ah+=mkcard('Need To Open',fmt(ntoData.length),'pk','needopen');
   ah+=mkcard('Need To Close',fmt(ntcData.length),'r','needclose');
-  ah+=mkcard('Inactive In Stock',fmt(iisData.length),'o','inactiveInStock');
+  ah+=mkcard('Need To Activate',fmt(iisData.length),'o','inactiveInStock');
   document.getElementById('actionCards').innerHTML=ah;
 }
 function mkcard(label,value,cc,type){
