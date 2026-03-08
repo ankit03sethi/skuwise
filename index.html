@@ -1066,7 +1066,7 @@ function downloadGlobalCSV(){
 
 // ===== MAIN TABLE =====
 function detectRatingCols(){RATING_COLS=[];for(var i=0;i<HEADERS.length;i++){var h=String(HEADERS[i]||'').toUpperCase();if(h.indexOf('RATING')>=0||h.indexOf('STAR')>=0||h.indexOf('REVIEW')>=0)RATING_COLS.push(i);}}
-function detectNumericCols(){NUMERIC_COLS=[];for(var c=0;c<HEADERS.length;c++){var nc=0,t=0;for(var r=0;r<ALL_DATA.length&&r<500;r++){var v=ALL_DATA[r][c];if(v===''||v===null||v===undefined)continue;t++;if(!isNaN(Number(v)))nc++;}if(t>0&&nc/t>0.7)NUMERIC_COLS.push(c);}}
+function detectNumericCols(){NUMERIC_COLS=[];for(var c=0;c<HEADERS.length;c++){var nc=0,t=0;for(var r=0;r<ALL_DATA.length&&r<500;r++){var v=ALL_DATA[r][c];if(v===''||v===null||v===undefined)continue;var sv=String(v).trim();if(sv==='-'||sv==='--'||sv==='N/A'||sv==='n/a'||sv==='NA')continue;t++;if(!isNaN(Number(sv)))nc++;}if(t>0&&nc/t>0.7)NUMERIC_COLS.push(c);}}
 function collectNumericUniqueVals(){
   NUMERIC_UNIQUE_VALS={};
   for(var ci=0;ci<NUMERIC_COLS.length;ci++){
