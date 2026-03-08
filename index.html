@@ -382,12 +382,12 @@ function renderCards(){
     d7+=Number(data[i][ci.day7])||0;d15+=Number(data[i][ci.day15])||0;d30+=Number(data[i][ci.day30])||0;d60+=Number(data[i][ci.day60])||0;
   }
   var sh='';
-  sh+=mkcard('60-Day',fmt(Math.round(d60)),'pk','day60');
-  sh+=mkcard('30-Day',fmt(Math.round(d30)),'p','day30');
-  sh+=mkcard('15-Day',fmt(Math.round(d15)),'o','day15');
-  sh+=mkcard('7-Day',fmt(Math.round(d7)),'o','day7');
-  sh+=mkcard('3-Day',fmt(Math.round(d3)),'g','day3');
   sh+=mkcard('Today',fmt(Math.round(tdy)),'g','today');
+  sh+=mkcard('3-Day',fmt(Math.round(d3)),'g','day3');
+  sh+=mkcard('7-Day',fmt(Math.round(d7)),'o','day7');
+  sh+=mkcard('15-Day',fmt(Math.round(d15)),'o','day15');
+  sh+=mkcard('30-Day',fmt(Math.round(d30)),'p','day30');
+  sh+=mkcard('60-Day',fmt(Math.round(d60)),'pk','day60');
   document.getElementById('salesCards').innerHTML=sh;
 
   var sth='';
