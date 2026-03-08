@@ -1084,6 +1084,7 @@ function buildColumnFilters(){
   for(var c=0;c<HEADERS.length;c++){
     var hdr=String(HEADERS[c]||'').trim();if(!hdr){colSets.push(null);continue;}
     if(NUMERIC_COLS.indexOf(c)>=0){colSets.push('NUMERIC');continue;}
+    var hu=hdr.toUpperCase();if(hu==='COUNT'||hu==='PRICE'||hu==='RATINGS'||hu.indexOf('SALE')>=0||hu.indexOf('STOCK AT')>=0||hu==='ESTIMATED SP'){if(NUMERIC_COLS.indexOf(c)<0)NUMERIC_COLS.push(c);colSets.push('NUMERIC');continue;}
     var vals={},uc=0;
     for(var r=0;r<ALL_DATA.length;r++){var v=String(ALL_DATA[r][c]||'').trim();if(v){if(!vals[v]){vals[v]=1;uc++;}}}
     if(uc<2){colSets.push(null);continue;}
