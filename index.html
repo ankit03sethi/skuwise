@@ -831,13 +831,13 @@ function slGoTo(level){
   else if(level===3){SL.level=4;SL.sku='';document.getElementById('modalTitle').textContent=t+' - '+SL.prod+' - SKUs';document.getElementById('modalNav').style.display='flex';slBread();renderSLSkus();}
 }
 function slGrid(items,clickFn,allData){
-  var colors=['#4fc3f7','#39ff14','#e09f3e','#a855f7','#dc2f02','#f72585','#7209b7','#3a0ca3'];
   var h='<div class="drill-grid">';
-  h+='<div class="drill-item all-item" onclick="'+clickFn+'(\'\')"><div class="di-name">ALL</div><div class="di-count">'+fmt(slTotalLoss(allData))+' /day</div></div>';
+  var total=slTotalLoss(allData);
+  h+='<div class="drill-item" style="border-left-color:#ff4444;background:#1a0d0d" onclick="'+clickFn+'(\'\')"><div class="di-name" style="color:#ff4444">ALL</div><div class="di-count" style="color:#ff4444">'+fmt(total)+'</div></div>';
   for(var i=0;i<items.length;i++){
-    var p=items[i];
-    h+='<div class="drill-item" style="border-left-color:'+colors[i%colors.length]+'" onclick="'+clickFn+'(\''+p.name.replace(/'/g,"\\'")+'\')">';
-    h+='<div class="di-name">'+p.name+'</div><div class="di-count">'+fmt(p.loss)+' /day</div></div>';
+    var p=items[i];if(p.loss<=0)continue;
+    h+='<div class="drill-item" style="border-left-color:#ff4444;background:#1a0d0d" onclick="'+clickFn+'(\''+p.name.replace(/'/g,"\\'")+'\')">';
+    h+='<div class="di-name" style="color:#ff6666">'+p.name+'</div><div class="di-count" style="color:#ff4444">'+fmt(p.loss)+'</div></div>';
   }
   h+='</div>';return h;
 }
@@ -911,7 +911,7 @@ function renderSLTable(){
   SL_LOADED=0;
   var ci=getSalesIndexes();var totalLoss=slTotalLoss(SL.skuFiltered);
   var h='<div class="modal-toolbar"><input class="srch" id="slSearch" placeholder="Search SKUs..." oninput="renderSLTable()" value="'+(sq||'')+'">';
-  h+='<span style="color:#ff4444;font-weight:700;margin:0 12px">Daily Loss: '+fmt(totalLoss)+' units/day</span>';
+  h+='<span style="color:#ff4444;font-weight:700;margin:0 12px">Daily Loss: '+fmt(totalLoss)+'</span>';
   h+='<button class="fbtn dl" onclick="downloadSLCSV()">Download CSV</button></div>';
   h+='<div class="m-tbox"><h3>SKU Details <span>Showing 0-0 of '+SL.skuFiltered.length+'</span></h3>';
   h+='<div class="m-twrap"><table><thead><tr>';
