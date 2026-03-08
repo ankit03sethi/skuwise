@@ -425,8 +425,8 @@ function renderCards(){
   var slh='';
   slh+='<div class="cd b" onclick="openSalesLossType(\'totalloss\',\'Total Daily Sales Loss\')"><div class="lb">Total</div><div class="vl">'+fmt(totalLossVal)+'</div></div>';
   slh+='<div class="cd pk" onclick="openSalesLossType(\'needopen\',\'Need to Open Loss\')"><div class="lb">Need to Open Loss</div><div class="vl">'+fmt(ntoLoss)+'</div></div>';
-  slh+='<div class="cd r" onclick="openSalesLossType(\'salesloss\',\'Daily Sales Loss\')"><div class="lb">Daily Sales Loss</div><div class="vl">'+fmt(dailyLoss)+'</div></div>';
   slh+='<div class="cd o" onclick="openSalesLossType(\'inactiveInStock\',\'Need to Activate Loss\')"><div class="lb">Need to Activate Loss</div><div class="vl">'+fmt(ntaLoss)+'</div></div>';
+  slh+='<div class="cd r" onclick="openSalesLossType(\'salesloss\',\'Out of Stock Loss\')"><div class="lb">Out of Stock Loss</div><div class="vl">'+fmt(dailyLoss)+'</div></div>';
   document.getElementById('salesLossCards').innerHTML=slh;
 
   var ntoData=filterByType('needopen',data);
