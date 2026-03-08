@@ -409,15 +409,15 @@ function renderCards(){
   document.getElementById('statusCards').innerHTML=sth;
 
   var ci2=getSalesIndexes();
-  var ntoLossData=filterByType('needopen',data);var ntoLossTotal=0;
+  var ntoLossData=filterWithSales(filterByType('needopen',data));var ntoLossTotal=0;
   for(var i=0;i<ntoLossData.length;i++)ntoLossTotal+=Number(ntoLossData[i][ci2.day60])||0;
   var ntoLoss=Math.round(ntoLossTotal/60);
 
-  var slData=filterByType('salesloss',data);var slTotal=0;
+  var slData=filterWithSales(filterByType('salesloss',data));var slTotal=0;
   for(var i=0;i<slData.length;i++)slTotal+=Number(slData[i][ci2.day60])||0;
   var dailyLoss=Math.round(slTotal/60);
 
-  var ntaLossData=filterByType('inactiveInStock',data);var ntaLossTotal=0;
+  var ntaLossData=filterWithSales(filterByType('inactiveInStock',data));var ntaLossTotal=0;
   for(var i=0;i<ntaLossData.length;i++)ntaLossTotal+=Number(ntaLossData[i][ci2.day60])||0;
   var ntaLoss=Math.round(ntaLossTotal/60);
 
@@ -803,9 +803,14 @@ function slTotalLoss(data){
   for(var i=0;i<data.length;i++)t+=((Number(data[i][ci.day60])||0)/60);
   return Math.round(t);
 }
+function hasAnySale(row){
+  var ci=getSalesIndexes();
+  return (Number(row[ci.today])||0)>0||(Number(row[ci.day3])||0)>0||(Number(row[ci.day7])||0)>0||(Number(row[ci.day15])||0)>0||(Number(row[ci.day30])||0)>0||(Number(row[ci.day60])||0)>0;
+}
+function filterWithSales(data){var r=[];for(var i=0;i<data.length;i++){if(hasAnySale(data[i]))r.push(data[i]);}return r;}
 function openSalesLossType(filterType,title){
-  var data=filterByType(filterType,FILTERED);
-  SL={level:1,title:title,baseData:data,catData:[],subcatData:[],prodData:[],skuData:[],skuFiltered:[],cat:'',subcat:'',prod:'',sku:'',sortCol:-1,sortDir:1};
+  var data=filterWithSales(filterByType(filterType,FILTERED));
+  SL={level:1,title:title,baseData:data,catData:[],subcatData:[],prodData:[],skuData:[],skuFiltered:[],cat:'',subcat:'',prod:'',sortCol:-1,sortDir:1};
   document.getElementById('modalTitle').textContent=title+' - Categories';
   document.getElementById('modalNav').style.display='none';
   renderSLCategories();
@@ -826,13 +831,18 @@ function slGoTo(level){
   else if(level===1){SL.level=2;SL.subcat='';SL.prod='';document.getElementById('modalTitle').textContent=t+' - '+SL.cat+' - Sub Categories';document.getElementById('modalNav').style.display='flex';slBread();renderSLSubcats();}
   else if(level===2){SL.level=3;SL.prod='';document.getElementById('modalTitle').textContent=t+' - '+SL.subcat+' - Products';document.getElementById('modalNav').style.display='flex';slBread();renderSLProducts();}
 }
+var SL_GRID_ITEMS=[];
+function slGridClick(fn,idx){if(idx===0)window[fn]('');else if(SL_GRID_ITEMS[idx])window[fn](SL_GRID_ITEMS[idx]);}
 function slGrid(items,clickFn,allData){
+  SL_GRID_ITEMS=[''];
   var h='<div class="drill-grid">';
   var total=slTotalLoss(allData);
-  h+='<div class="drill-item" style="border-left-color:#ff4444;background:#1a0d0d" onclick="'+clickFn+'(\'\')"><div class="di-name" style="color:#eee">ALL</div><div class="di-count" style="color:#ff4444">'+fmt(total)+'</div></div>';
+  h+='<div class="drill-item" style="border-left-color:#ff4444;background:#1a0d0d" onclick="slGridClick(\''+clickFn+'\',0)"><div class="di-name" style="color:#eee">ALL</div><div class="di-count" style="color:#ff4444">'+fmt(total)+'</div></div>';
   for(var i=0;i<items.length;i++){
     var p=items[i];if(p.loss<=0)continue;
-    h+='<div class="drill-item" style="border-left-color:#ff4444;background:#1a0d0d" onclick="'+clickFn+'(\''+p.name.replace(/'/g,"\\'")+'\')">';
+    SL_GRID_ITEMS.push(p.name);
+    var idx=SL_GRID_ITEMS.length-1;
+    h+='<div class="drill-item" style="border-left-color:#ff4444;background:#1a0d0d" onclick="slGridClick(\''+clickFn+'\','+idx+')">';
     h+='<div class="di-name" style="color:#eee">'+p.name+'</div><div class="di-count" style="color:#ff4444">'+fmt(p.loss)+'</div></div>';
   }
   h+='</div>';return h;
