@@ -373,6 +373,11 @@ function filterByType(type,dataset){
       case 'stable':if(getTrend(r)==='stable')result.push(r);break;
       case 'nosale':if(getTrend(r)==='nosale')result.push(r);break;
       case 'salesloss':if(stock==='OUT OF STOCK'&&isActiveValue(r[ACTIVE_COL]))result.push(r);break;
+      case 'totalloss':{var added=false;
+        if(stock==='OUT OF STOCK'&&isActiveValue(r[ACTIVE_COL])){result.push(r);added=true;}
+        if(!added&&!isActiveValue(r[ACTIVE_COL])&&stock==='IN STOCK'){result.push(r);added=true;}
+        if(!added){if(STOCK_IN_PLAT_COL>=0){var sv3=String(r[STOCK_IN_PLAT_COL]===null||r[STOCK_IN_PLAT_COL]===undefined?'':r[STOCK_IN_PLAT_COL]).trim();var sipVal3=parseFloat(sv3);if(stock==='IN STOCK'&&sv3!==''&&!isNaN(sipVal3)&&sipVal3===0){result.push(r);}}
+        else{if(stock==='IN STOCK'&&!isActiveValue(r[ACTIVE_COL]))result.push(r);}}break;}
     }
   }
   return result;
@@ -416,7 +421,9 @@ function renderCards(){
   for(var i=0;i<ntaLossData.length;i++)ntaLossTotal+=Number(ntaLossData[i][ci2.day60])||0;
   var ntaLoss=Math.round(ntaLossTotal/60);
 
+  var totalLossVal=ntoLoss+dailyLoss+ntaLoss;
   var slh='';
+  slh+='<div class="cd b" onclick="openSalesLossType(\'totalloss\',\'Total Daily Sales Loss\')"><div class="lb">Total</div><div class="vl">'+fmt(totalLossVal)+'</div></div>';
   slh+='<div class="cd pk" onclick="openSalesLossType(\'needopen\',\'Need to Open Loss\')"><div class="lb">Need to Open Loss</div><div class="vl">'+fmt(ntoLoss)+'</div></div>';
   slh+='<div class="cd r" onclick="openSalesLossType(\'salesloss\',\'Daily Sales Loss\')"><div class="lb">Daily Sales Loss</div><div class="vl">'+fmt(dailyLoss)+'</div></div>';
   slh+='<div class="cd o" onclick="openSalesLossType(\'inactiveInStock\',\'Need to Activate Loss\')"><div class="lb">Need to Activate Loss</div><div class="vl">'+fmt(ntaLoss)+'</div></div>';
