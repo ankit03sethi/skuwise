@@ -166,7 +166,7 @@ td a:hover{text-decoration:underline;color:#39ff14}
 <div class="fbox">
 <h3>Filters</h3>
 <div class="frow" id="filterRow">
-  <input class="srch" id="searchBox" placeholder="Search anything..." oninput="applyAll()">
+  <input class="srch" id="searchBox" placeholder="Search anything..." oninput="syncTableSearchFromFilter();applyAll()">
   <button class="fbtn" onclick="applyAll()">Apply</button>
   <button class="fbtn clr" onclick="clearFilters()">Clear</button>
   <button class="fbtn ref" onclick="loadData()">Refresh</button>
@@ -187,7 +187,13 @@ td a:hover{text-decoration:underline;color:#39ff14}
 
 <!-- MAIN TABLE -->
 <div class="tbox">
-<h3>All SKU Data <span id="ttotal" style="color:#39ff14;font-size:13px;font-weight:700;margin-left:8px"></span> <span id="tcount"></span></h3>
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+<h3 style="margin:0">All SKU Data <span id="ttotal" style="color:#39ff14;font-size:13px;font-weight:700;margin-left:8px"></span> <span id="tcount"></span></h3>
+<div style="display:flex;align-items:center;gap:6px">
+<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#39ff14;stroke-width:1.5;flex-shrink:0"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+<input id="tableSearchBox" placeholder="Search SKUs..." oninput="tableSearchSync(this.value)" style="background:#0a0f1e;color:#eee;border:1px solid #39ff14;border-radius:6px;padding:6px 12px;font-size:12px;width:220px;outline:none">
+</div>
+</div>
 <div class="twrap">
   <table><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table>
 </div>
@@ -294,10 +300,46 @@ function onDataLoaded(d){
   document.getElementById('app').style.display='block';
   document.getElementById('lastUp').textContent='Updated: '+new Date().toLocaleString();
   document.getElementById('info').textContent='SKU WISE';
-  buildColumnFilters();applyAll();
+  buildColumnFilters();applyAll();startSoftRefresh();
 }
 function onErr(msg){document.getElementById('loader').innerHTML='<div style="color:#dc2f02;font-size:14px">'+msg+'</div>';}
 function fmt(n){return n==null?'0':Number(n).toLocaleString('en-IN');}
+
+// ===== TABLE SEARCH BAR SYNC =====
+function tableSearchSync(val){
+  document.getElementById('searchBox').value=val;
+  applyAll();
+}
+function syncTableSearchFromFilter(){
+  var ts=document.getElementById('tableSearchBox');
+  if(ts)ts.value=document.getElementById('searchBox').value;
+}
+
+// ===== SOFT AUTO-REFRESH =====
+var SOFT_REFRESH_INTERVAL=60000;
+var _softTimer=null;
+function startSoftRefresh(){if(_softTimer)clearInterval(_softTimer);_softTimer=setInterval(softRefresh,SOFT_REFRESH_INTERVAL);}
+function softRefresh(){
+  fetch(API_URL,{redirect:'follow'})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+    .then(function(text){
+      if(!text||text.trim().length===0)return;
+      if(text.trim().charAt(0)==='<')return;
+      try{
+        var d=JSON.parse(text);
+        if(d.error)return;
+        var rawRows=d.rows||[];var cleanRows=[];
+        for(var i=0;i<rawRows.length;i++){if(rawRows[i][0]&&String(rawRows[i][0]).trim()!=='')cleanRows.push(rawRows[i]);}
+        ALL_DATA=cleanRows;HEADERS=d.headers||[];
+        detectRatingCols();detectNumericCols();collectNumericUniqueVals();detectStockInPlatCol();
+        document.getElementById('lastUp').textContent='Updated: '+new Date().toLocaleString();
+        var scrollY=window.scrollY;
+        applyAll();
+        window.scrollTo(0,scrollY);
+      }catch(e){}
+    })
+    .catch(function(){});
+}
 
 // ===== SALES INDEXES =====
 function getSalesIndexes(){
@@ -1354,7 +1396,7 @@ function clearFilters(){
     renderTextDDList(parseInt(k),'');
     updateTextBtnLabel(parseInt(k));
   }
-  SORT_COL=-1;SORT_DIR=1;applyAll();
+  SORT_COL=-1;SORT_DIR=1;var ts=document.getElementById('tableSearchBox');if(ts)ts.value='';applyAll();
 }
 function applyAll(){
   var tf=[];var ns=null;var exactFilters=[];var textFilters=[];var rangeFilters=[];
