@@ -1096,7 +1096,7 @@ function buildColumnFilters(){
   numDDState={};
   textDDState={};
   TEXT_UNIQUE_VALS={};
-  var companyFilterEl=null;
+  var companyFilterEl=null;var estSpEl=null;
   for(var c=0;c<colSets.length;c++){
     if(!colSets[c])continue;
     var hdr=String(HEADERS[c]||'').trim().toUpperCase();
@@ -1129,6 +1129,7 @@ function buildColumnFilters(){
         +'</div>';
       wrap.innerHTML=numHtml;
       frow.insertBefore(wrap,sb);
+      if(hdr.indexOf('ESTIMATED')>=0||hdr.indexOf('EST')>=0&&hdr.indexOf('SP')>=0)estSpEl=wrap;
       renderNumDDList(c,'');
     } else if(colSets[c]==='TEXT_DD'){
       // Create searchable text dropdown for columns with >200 unique values
@@ -1175,13 +1176,13 @@ function buildColumnFilters(){
   if(aiSel.nextSibling){frow.insertBefore(trendSel,aiSel.nextSibling);}
   else{frow.insertBefore(trendSel,sb);}
 
-  // Add High Shipping / Low Price filters
+  // Add High Shipping / Low Price filters after ESTIMATED SP
   var hsSel=document.createElement('select');hsSel.className='col-filter';hsSel.id='highShipFilter';
   hsSel.style.cssText='background:#0a0f1e;color:#eee;border:1px solid #444;border-radius:6px;padding:5px 8px;font-size:11px;min-width:110px;max-width:160px';
   hsSel.setAttribute('data-type','special-hs');
   hsSel.innerHTML='<option value="">HIGH SHIPPING</option><option value="YES">High Shipping</option>';
   hsSel.onchange=applyAll;
-  if(trendSel.nextSibling){frow.insertBefore(hsSel,trendSel.nextSibling);}
+  if(estSpEl&&estSpEl.nextSibling){frow.insertBefore(hsSel,estSpEl.nextSibling);}
   else{frow.insertBefore(hsSel,sb);}
 
   var lpSel=document.createElement('select');lpSel.className='col-filter';lpSel.id='lowPriceFilter';
